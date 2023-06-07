@@ -1,0 +1,10 @@
+^C:\8503_FRESH\CSC8503-MAIN\BUILD\CMAKEFILES\9FE1F7081DD2381ED3E8B411A7D48859\GENERATE.STAMP.RULE
+setlocal
+H:\CMake\bin\cmake.exe -SC:/8503_Fresh/CSC8503-main -BC:/8503_Fresh/CSC8503-main/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/8503_Fresh/CSC8503-main/build/CSC8503.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
