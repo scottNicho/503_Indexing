@@ -1,0 +1,14 @@
+﻿  1>Building Custom Rule C:/8503_Fresh/CSC8503-main/OpenGLRendering/CMakeLists.txt
+  OGLComputeShader.h
+  OGLMesh.h
+  OGLRenderer.h
+  OGLShader.h
+  OGLTexture.h
+  OGLComputeShader.cpp
+  OGLMesh.cpp
+  OGLRenderer.cpp
+  OGLShader.cpp
+  OGLTexture.cpp
+  gl.h
+  gl.c
+  OpenGLRendering.vcxproj -> C:\8503_Fresh\CSC8503-main\x64\Debug\OpenGLRendering.lib

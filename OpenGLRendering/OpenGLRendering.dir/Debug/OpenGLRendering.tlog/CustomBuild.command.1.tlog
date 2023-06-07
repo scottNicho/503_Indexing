@@ -1,0 +1,10 @@
+^C:\8503_FRESH\CSC8503-MAIN\OPENGLRENDERING\CMAKELISTS.TXT
+setlocal
+H:\CMake\bin\cmake.exe -SC:/8503_Fresh/CSC8503-main -BC:/8503_Fresh/CSC8503-main/build --check-stamp-file C:/8503_Fresh/CSC8503-main/build/OpenGLRendering/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

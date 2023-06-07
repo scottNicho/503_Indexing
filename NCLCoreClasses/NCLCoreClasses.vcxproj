@@ -1,0 +1,223 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{79D5D892-AC9C-3FFD-BEAB-1E917CFFA980}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.22621.0</WindowsTargetPlatformVersion>
+    <Platform>x64</Platform>
+    <ProjectName>NCLCoreClasses</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\8503_Fresh\CSC8503-main\x64\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NCLCoreClasses.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NCLCoreClasses</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\8503_Fresh\CSC8503-main\x64\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NCLCoreClasses.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NCLCoreClasses</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.lib</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <ConformanceMode>true</ConformanceMode>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <SDLCheck>true</SDLCheck>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_MBCS;ASSETROOTLOCATION="C:/8503_Fresh/CSC8503-main/Assets/";CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_MBCS;ASSETROOTLOCATION=\"C:/8503_Fresh/CSC8503-main/Assets/\";CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ConformanceMode>true</ConformanceMode>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <SDLCheck>true</SDLCheck>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS;_MBCS;ASSETROOTLOCATION="C:/8503_Fresh/CSC8503-main/Assets/";CMAKE_INTDIR="Release"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS;_MBCS;ASSETROOTLOCATION=\"C:/8503_Fresh/CSC8503-main/Assets/\";CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\CMakeLists.txt">
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</BuildInParallel>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/8503_Fresh/CSC8503-main/NCLCoreClasses/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+H:\CMake\bin\cmake.exe -SC:/8503_Fresh/CSC8503-main -BC:/8503_Fresh/CSC8503-main/build --check-stamp-file C:/8503_Fresh/CSC8503-main/build/NCLCoreClasses/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\8503_Fresh\CSC8503-main\CMake\Default.cmake;C:\8503_Fresh\CSC8503-main\CMake\DefaultCXX.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\8503_Fresh\CSC8503-main\build\NCLCoreClasses\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</BuildInParallel>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/8503_Fresh/CSC8503-main/NCLCoreClasses/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+H:\CMake\bin\cmake.exe -SC:/8503_Fresh/CSC8503-main -BC:/8503_Fresh/CSC8503-main/build --check-stamp-file C:/8503_Fresh/CSC8503-main/build/NCLCoreClasses/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\8503_Fresh\CSC8503-main\CMake\Default.cmake;C:\8503_Fresh\CSC8503-main\CMake\DefaultCXX.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\8503_Fresh\CSC8503-main\build\NCLCoreClasses\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\Assets.cpp" />
+    <ClInclude Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\Assets.h" />
+    <ClCompile Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\SimpleFont.cpp" />
+    <ClInclude Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\SimpleFont.h" />
+    <ClCompile Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\TextureLoader.cpp" />
+    <ClInclude Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\TextureLoader.h" />
+    <ClCompile Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\TextureWriter.cpp" />
+    <ClInclude Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\TextureWriter.h" />
+    <ClInclude Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\Camera.h" />
+    <ClCompile Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\Maths.cpp" />
+    <ClInclude Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\Maths.h" />
+    <ClCompile Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\Matrix2.cpp" />
+    <ClInclude Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\Matrix2.h" />
+    <ClCompile Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\Matrix3.cpp" />
+    <ClInclude Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\Matrix3.h" />
+    <ClCompile Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\Matrix4.cpp" />
+    <ClInclude Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\Matrix4.h" />
+    <ClCompile Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\Plane.cpp" />
+    <ClInclude Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\Plane.h" />
+    <ClCompile Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\Quaternion.cpp" />
+    <ClInclude Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\Quaternion.h" />
+    <ClCompile Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\Vector2.cpp" />
+    <ClInclude Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\Vector2.h" />
+    <ClCompile Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\Vector3.cpp" />
+    <ClInclude Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\Vector3.h" />
+    <ClCompile Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\Vector4.cpp" />
+    <ClInclude Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\Vector4.h" />
+    <ClCompile Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\MeshAnimation.cpp" />
+    <ClInclude Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\MeshAnimation.h" />
+    <ClCompile Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\MeshGeometry.cpp" />
+    <ClInclude Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\MeshGeometry.h" />
+    <ClCompile Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\MeshMaterial.cpp" />
+    <ClInclude Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\MeshMaterial.h" />
+    <ClCompile Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\RendererBase.cpp" />
+    <ClInclude Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\RendererBase.h" />
+    <ClCompile Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\ShaderBase.cpp" />
+    <ClInclude Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\ShaderBase.h" />
+    <ClCompile Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\TextureBase.cpp" />
+    <ClInclude Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\TextureBase.h" />
+    <ClCompile Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\Camera.cpp" />
+    <ClCompile Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\GameTimer.cpp" />
+    <ClInclude Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\GameTimer.h" />
+    <ClCompile Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\Keyboard.cpp" />
+    <ClInclude Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\Keyboard.h" />
+    <ClCompile Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\Mouse.cpp" />
+    <ClInclude Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\Mouse.h" />
+    <ClCompile Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\Window.cpp" />
+    <ClInclude Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\Window.h" />
+    <ClCompile Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\Win32Keyboard.cpp" />
+    <ClInclude Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\Win32Keyboard.h" />
+    <ClCompile Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\Win32Mouse.cpp" />
+    <ClInclude Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\Win32Mouse.h" />
+    <ClCompile Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\Win32Window.cpp" />
+    <ClInclude Include="C:\8503_Fresh\CSC8503-main\NCLCoreClasses\Win32Window.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="C:\8503_Fresh\CSC8503-main\build\ZERO_CHECK.vcxproj">
+      <Project>{B85A38BF-30E2-3AEC-B8E7-4AF935E60B98}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
