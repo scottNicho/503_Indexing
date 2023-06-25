@@ -13,12 +13,13 @@ namespace NCL::CSC8503 {
 			std::vector<keyType> Keys;
 			BPT_Node* parent;
 			std::vector<BPT_Node*> children;
+			
 
 			BPT_Node(bool isLeaf = false) {
 				leaf = isLeaf;
-				numKeys(0);
-				parent(nullptr);
-				children(Order, nullptr)
+				numKeys = 0;
+				parent = nullptr;
+				children = std::vector<BPT_Node*>(order, nullptr);
 				Keys = {};
 			}
 
@@ -47,6 +48,27 @@ namespace NCL::CSC8503 {
 			delete root;
 		}
 
+		void InsertIntoTree(keyType& key) {
+			BPT_Node current = root;
+			if (current.nodeFull()) {
+				BPT_Node* newNode = new BPT_Node();
+				newNode->children[0] = current;
+				root = newNode;
+
+				splitNode(newNode,0);
+				InsertOpen(newNode,key);
+			}
+			else
+			{
+				InsertOpen(current,key);
+			}
+		}
+
+		void TotalClear() {
+			Clear(root);
+			root->numKeys = 0;
+		}
+
 	protected:
 		size_t order;
 
@@ -68,14 +90,18 @@ namespace NCL::CSC8503 {
 			if (node->isLeaf()) { insertInLeaf(node,newKey); }
 			else
 			{
-				unsigned int xi = leaf->numKeys;
+				unsigned int xi = node->numKeys;
 				while (xi > 0 && newKey < node->Keys[xi - 1]) {
 					xi--;
 				}
 				BPT_Node* childNode = node->children[xi]; //get the child to go too
 
-				if (ChildNode->nodeFull()) {
-					//fill in with node splitting operations 
+				if (childNode->nodeFull()) {
+					splitNode(node,xi);
+					if (newKey > node->Keys[xi]) {
+						xi++;
+						childNode = node->children[xi];
+					}
 				}
 				InsertOpen(childNode, newKey);
 			}
@@ -94,24 +120,33 @@ namespace NCL::CSC8503 {
 			}
 
 			if (!(childNode->isLeaf())) {
-				for (size_t i = 0; i <= midIndex; ++i) {
-					newNode->children[i] = childNode->children[i + middle + 1];//add correct pointers
+				for (size_t i = 0; i <= middle; ++i) {
+					newSplitNode->children[i] = childNode->children[i + middle + 1];//add correct pointers
 					childNode->children[i + middle + 1] = nullptr;//set pointers that have been moved to the split node
 				}
 			}
 			childNode->numKeys = middle;
 
 			for (int i = parent->numKeys; i > childIndex; --i) {
-				parentNode->children[i + 1] = parentNode->children[i];
+				parent->children[i + 1] = parent->children[i];
 			}
 
-			parent->children[childIndex + 1] = newNode;
+			parent->children[childIndex + 1] = newSplitNode;
 
 			for (int xi = parent->numKeys; xi > childIndex; --xi) {
 				parent->keys[xi] = parent->keys[xi - 1];
 			}
 			parent->Keys[childIndex] = middleKey;
 			parent->numKeys += 1;
+		}
+
+		void Clear(BPT_Node* node) {
+			if (node.isLeaf) { return;}
+			for (int h = 0; h <= node->numKeys ; h++) {
+				Clear(node->children[h]);
+				delete node->children[h];
+			}
+				
 		}
 
 	};
