@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <vector>
+#include "NPC.h"
 
 namespace NCL::CSC8503 {
 	template<typename keyType>
@@ -13,7 +14,7 @@ namespace NCL::CSC8503 {
 			std::vector<keyType> Keys;
 			BPT_Node* parent;
 			std::vector<BPT_Node*> children;
-			
+			BPT_Node* next;
 
 			BPT_Node(bool isLeaf = false) {
 				leaf = isLeaf;
@@ -67,6 +68,10 @@ namespace NCL::CSC8503 {
 		void TotalClear() {
 			Clear(root);
 			root->numKeys = 0;
+		}
+
+		BPT_Node* SearchFromTop(keyType& key) {
+			return(DeepSearch(root, key));
 		}
 
 	protected:
@@ -147,6 +152,23 @@ namespace NCL::CSC8503 {
 				delete node->children[h];
 			}
 				
+		}
+
+		BPT_Node* DeepSearch(BPT_Node* startNode, keyType &key) {
+			int i = 0;
+			while (i < startNode->numKeys && key > startNode->keys[i]) {
+				++i;
+			}
+
+			if (i < startNode->numKeys && key == startNode->keys[i]) {
+				return &(startNode->keys[i]); 
+			}
+			else if (startNode->IsLeaf()) {
+				return nullptr; 
+			}
+			else {
+				return SearchInternal(startNode->children[i], key);
+			}
 		}
 
 	};

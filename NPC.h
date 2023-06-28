@@ -101,6 +101,8 @@ namespace NCL::CSC8503 {
 
 		const NPC_Colour& GetNPCtype() { return NPC_type; }
 
+		int GetID() { return ID;}
+
 	protected:
 		static int currentID;
 		int ID;
