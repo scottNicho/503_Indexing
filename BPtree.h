@@ -43,6 +43,7 @@ namespace NCL::CSC8503 {
 
 		BPtree() {
 			root = new BPT_Node();
+			currentLinkedNode = nullptr;
 		}
 
 		~BPtree() {
@@ -74,11 +75,25 @@ namespace NCL::CSC8503 {
 			return(DeepSearch(root, key));
 		}
 
+		void SetFirstListNode(BPT_Node* first) {
+			FirstListNode = first;
+			currentLinkedNode = first;
+			listStarted = true;
+		}
+
+		BPT_Node* GetNextNodeList(BPT_Node* node) {
+			return node->next;
+		}
+
 	protected:
 		size_t order;
 
 	private:
 		BPT_Node* root;
+		BPT_Node* currentLinkedNode;
+		BPT_Node* FirstListNode;
+		
+		bool listStarted = false;
 
 		void insertInLeaf(BPT_Node* leaf,keyType &newKey) {
 			unsigned int xi = leaf->numKeys;
@@ -89,10 +104,16 @@ namespace NCL::CSC8503 {
 			}
 			leaf->Keys[xi] = newKey;
 			leaf->numKeys += 1;
+			if (!CheckNodeInList(leaf)) {
+				SetNextNodeList(leaf);
+			}
 		}
 
-		void InsertOpen(BPT_Node* node, keyType &newKey) {
-			if (node->isLeaf()) { insertInLeaf(node,newKey); }
+		void InsertOpen(BPT_Node* node, BPT_Node* parentNode,keyType &newKey) {
+			if (node->isLeaf()) { 
+				insertInLeaf(node,newKey);
+				node->parent = parentNode;//set parent
+			}
 			else
 			{
 				unsigned int xi = node->numKeys;
@@ -108,7 +129,7 @@ namespace NCL::CSC8503 {
 						childNode = node->children[xi];
 					}
 				}
-				InsertOpen(childNode, newKey);
+				InsertOpen(childNode,node, newKey);
 			}
 		}
 
@@ -122,6 +143,11 @@ namespace NCL::CSC8503 {
 			newSplitNode->numKeys = middle;
 			for (int q = 0; q < middle; q++) {
 				newSplitNode->Keys[q] = childNode->Keys[q + middle + 1];//add keys to the newly created node
+			}
+
+			if (childNode->isLeaf()) {
+				newSplitNode->next = childNode->next;
+				childNode->next = newSplitNode;
 			}
 
 			if (!(childNode->isLeaf())) {
@@ -143,6 +169,35 @@ namespace NCL::CSC8503 {
 			}
 			parent->Keys[childIndex] = middleKey;
 			parent->numKeys += 1;
+		}
+
+
+		void DeleteKey(keyType& key) {
+			BPT_Node* keyNode = SearchFromTop(key); //get the node the key is in
+
+			if (keyNode == nullptr) { return; }//get out clause 
+
+			unsigned int keyIndex = 0;
+			while (keyIndex < keyNode->numKeys && key > keyNode->Keys[keyIndex]) {
+				keyIndex++;
+			}
+
+			if (key != keyNode->Keys[keyIndex] || keyIndex >= keyNode->numKeys) { return; } //second getout cluase 
+
+			for (int xi = key; xi < keyNode->numKeys - 1; xi++) {
+				keyNode->Keys[keyIndex] = keyNode->Keys[keyIndex + 1];
+			}
+			keyNode->numKeys -= 1; //base deletion complete - check for tree balencing
+
+			if (keyNode->toFew()) {
+				BPT_Node* parent = keyNode->parent;
+				int keyNodeIndex = 0;
+				while (keyNodeIndex <= parent->numKeys && parent->children[keyNodeIndex] != keyNode) {
+					keyNodeIndex++;
+				}
+
+
+			}
 		}
 
 		void Clear(BPT_Node* node) {
@@ -171,6 +226,22 @@ namespace NCL::CSC8503 {
 			}
 		}
 
+		bool CheckNodeInList(BPT_Node* node) {
+			BPT_Node* current = FirstListNode;
+			if (node == FirstListNode) { return true };
+			while (current) {
+				current = current->next;
+				if(current == node){return true} // this node is allready in the list
+			}
+			return false;
+		}
+
+		
+
+		void SetNextNodeList(BPT_Node* nextNode) {
+			currentLinkedNode->next = nextNode;
+			currentLinkedNode = nextNode;
+		}
 	};
 
 }
