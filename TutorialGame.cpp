@@ -194,7 +194,7 @@ void TutorialGame::InitWorld() {
 	physics->UseGravity(true);
 
 	//InitMixedGridWorld(4,4, 3.0f, 3.0f);
-	InitSphereGridWorld(5,5,10,10,2);
+	//InitSphereGridWorld(5,5,10,10,2); tttiytfiytfgiuyg
 	InitGameExamples();
 	InitDefaultFloor();
 
@@ -262,8 +262,8 @@ GameObject* TutorialGame::AddSphereToWorld(const Vector3& position, float radius
 }
 
 
-NPC* TutorialGame::AddNPCToWorld(const Vector3& position, float radius, float inverseMass,NPC_Colour colour,NPC* newNpc) {
-	NPC* legion = newNpc;
+NPC* TutorialGame::AddNPCToWorld(const Vector3& position, float halfSize, float inverseMass,NPC_Colour colour) {
+	NPC* legion = new NPC(colour);
 	Vector4 blueV = { 0,0,1,1 };
 	Vector4 redV = { 1,0,0,1 };
 	Vector4 greenV = { 0,1,0,1 };
@@ -282,8 +282,8 @@ NPC* TutorialGame::AddNPCToWorld(const Vector3& position, float radius, float in
 		npcColourV = yellowV;
 	}
 	legion->SetName("LEGION");
-	Vector3 legionSize = Vector3(radius, radius, radius);
-	SphereVolume* volume = new SphereVolume(radius);
+	Vector3 legionSize = Vector3(halfSize, halfSize, halfSize);
+	AABBVolume* volume = new AABBVolume(legionSize);
 	legion->SetBoundingVolume((CollisionVolume*)volume);
 	
 
@@ -291,7 +291,7 @@ NPC* TutorialGame::AddNPCToWorld(const Vector3& position, float radius, float in
 		.SetScale(legionSize)
 		.SetPosition(position);
 
-	legion->SetRenderObject(new RenderObject(&legion->GetTransform(), sphereMesh, basicTex, basicShader));
+	legion->SetRenderObject(new RenderObject(&legion->GetTransform(), cubeMesh, basicTex, basicShader));
 	legion->SetPhysicsObject(new PhysicsObject(&legion->GetTransform(), legion->GetBoundingVolume()));
 
 	legion->GetPhysicsObject()->SetInverseMass(inverseMass);
@@ -303,6 +303,49 @@ NPC* TutorialGame::AddNPCToWorld(const Vector3& position, float radius, float in
 
 	return legion;
 }
+
+//For use with group NPC class
+//NPC* TutorialGame::AddNPCToWorld(const Vector3& position, float radius, float inverseMass, NPC_Colour colour, NPC* newNpc) {
+//	NPC* legion = newNpc;
+//	Vector4 blueV = { 0,0,1,1 };
+//	Vector4 redV = { 1,0,0,1 };
+//	Vector4 greenV = { 0,1,0,1 };
+//	Vector4 yellowV = { 1,1,0,1 };
+//	Vector4 npcColourV = blueV;
+//	if (colour == NPC_Colour::blue) {
+//		npcColourV = blueV;
+//	}
+//	else if (colour == NPC_Colour::red) {
+//		npcColourV = redV;
+//	}
+//	else if (colour == NPC_Colour::green) {
+//		npcColourV = greenV;
+//	}
+//	else if (colour == NPC_Colour::yellow) {
+//		npcColourV = yellowV;
+//	}
+//	legion->SetName("LEGION");
+//	Vector3 legionSize = Vector3(radius, radius, radius);
+//	SphereVolume* volume = new SphereVolume(radius);
+//	legion->SetBoundingVolume((CollisionVolume*)volume);
+//
+//
+//	legion->GetTransform()
+//		.SetScale(legionSize)
+//		.SetPosition(position);
+//
+//	legion->SetRenderObject(new RenderObject(&legion->GetTransform(), sphereMesh, basicTex, basicShader));
+//	legion->SetPhysicsObject(new PhysicsObject(&legion->GetTransform(), legion->GetBoundingVolume()));
+//
+//	legion->GetPhysicsObject()->SetInverseMass(inverseMass);
+//	legion->GetPhysicsObject()->InitSphereInertia();
+//	legion->GetPhysicsObject()->SetElasticity(0.0f);
+//	legion->setNPCColour(npcColourV);
+//
+//	world->AddGameObject(legion);
+//
+//	return legion;
+//}
 
 GameObject* NCL::CSC8503::TutorialGame::AddCollectableToWorld(const Vector3& position, float radius, float inverseMass)
 {
@@ -487,51 +530,51 @@ GameObject* TutorialGame::AddBonusToWorld(const Vector3& position) {
 
 StateGameObject* NCL::CSC8503::TutorialGame::AddStateObjectToWorld(const Vector3& position)
 {
-	StateGameObject* apple = new StateGameObject();
+	StateGameObject* obh = new StateGameObject();
 
 	SphereVolume* volume = new SphereVolume(0.5f);
-	apple->SetBoundingVolume((CollisionVolume*)volume);
-	apple->GetTransform()
+	obh->SetBoundingVolume((CollisionVolume*)volume);
+	obh->GetTransform()
 		.SetScale(Vector3(2, 2, 2))
 		.SetPosition(position);
 
-	apple->SetRenderObject(new RenderObject(&apple->GetTransform(), sphereMesh, nullptr, basicShader));
-	apple->SetPhysicsObject(new PhysicsObject(&apple->GetTransform(), apple->GetBoundingVolume()));
+	obh->SetRenderObject(new RenderObject(&obh->GetTransform(), sphereMesh, nullptr, basicShader));
+	obh->SetPhysicsObject(new PhysicsObject(&obh->GetTransform(), obh->GetBoundingVolume()));
 
-	apple->GetPhysicsObject()->SetInverseMass(1.0f);
-	apple->GetPhysicsObject()->InitSphereInertia();
+	obh->GetPhysicsObject()->SetInverseMass(1.0f);
+	obh->GetPhysicsObject()->InitSphereInertia();
 
-	world->AddGameObject(apple);
+	world->AddGameObject(obh);
 
-	return apple;
+	return obh;
 }
 
 void TutorialGame::InitDefaultFloor() {
-	AddFloorToWorld(Vector3(0, -20, 0));
+	AddFloorToWorld(Vector3(20, 20, 20));
 }
 
 void TutorialGame::InitGameExamples() {
 	//gameManager->bisKeyCollected = true;
-	door->AddDoorToWorld(Vector3(10, -15, 15), Vector3(2, 4, 2), 0.0f, cubeMesh, basicShader, basicTex);
-	CreateMaze("TestGrid1.txt");
-	AddKeyToWorld(Vector3(15, -15, 20), Vector3(1, 1, 1), 1.0f);
+	//door->AddDoorToWorld(Vector3(30, 25, 35), Vector3(2, 4, 2), 0.0f, cubeMesh, basicShader, basicTex);
+	//CreateMaze("TestGrid1.txt");
+	//AddKeyToWorld(Vector3(15, -15, 20), Vector3(1, 1, 1), 1.0f);
 	//AddDoorToWorld(Vector3(10, -15, 0), Vector3(1, 2, 1), 0.0f);
 	//coins->InitCollectableGridWorld(2, 2, 10, 10, .2f, this);
-	player->Init("Goaty",Vector3(80, 0, 50), charMesh, basicShader, world);
+	player->Init("Goaty",Vector3(80, 40, 50), charMesh, basicShader, world);
 	player->GetRenderObject()->SetColour(Vector4(0, 1, 0, 1));
 	
-	enemy = new Enemy(world,true);
-	goose = new Enemy(world,false);
+	//enemy = new Enemy(world,true);    ihuwohf;wiehwo
+	//goose = new Enemy(world,false);    kdhqoifwejwoepifjw
 	//AddEnemyToWorld(Vector3(5, 5, 0));
-	enemy->Init("Enemy", Vector3(80, 0, 10), enemyMesh, basicShader, world);
-	goose->Init("Goose", Vector3(50, 0, 10), gooseMesh, basicShader, world);
+	//enemy->Init("Enemy", Vector3(80, 40, 10), enemyMesh, basicShader, world);    ewfvwhgkuygfuwefygb
+	//goose->Init("Goose", Vector3(50, 40, 10), gooseMesh, basicShader, world);    fwqejnjh;ioewfuhjew;foij
 	
 	//enemy->findPath();
-	InitCollectableGridWorld(3, 3, 40, 40, 0.2f);
+	//InitCollectableGridWorld(3, 3, 40, 40, 0.2f);
 	//AddCollectableToWorld(Vector3(10, 2, 0), .2f, 1.0f);
-	PowerUpObj = AddBonusToWorld(Vector3(60, 0, 60));
+	//PowerUpObj = AddBonusToWorld(Vector3(60, 0, 60));
 
-	BridgeConstraintTest();
+	//BridgeConstraintTest();
 }
 
 void NCL::CSC8503::TutorialGame::CreateMaze(const std::string& filename)
@@ -559,9 +602,9 @@ void NCL::CSC8503::TutorialGame::CreateMaze(const std::string& filename)
 void TutorialGame::InitSphereGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, float radius) {
 	for (int x = 0; x < numCols; ++x) {
 		for (int z = 0; z < numRows; ++z) {
-			Vector3 position = Vector3(x * colSpacing, 10.0f, z * rowSpacing);
+			Vector3 position = Vector3(x * colSpacing, 40.0f, z * rowSpacing);
 			//AddSphereToWorld(position, radius, 1.0f);
-			//AddNPCToWorld(position,radius,1.0f,blue);
+			AddNPCToWorld(position,radius,1.0f,blue);
 		}
 
 	}

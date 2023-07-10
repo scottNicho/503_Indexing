@@ -79,7 +79,7 @@ namespace NCL {
 
 			void BridgeConstraintTest();
 
-			NPC*AddNPCToWorld(const Vector3& position, float radius, float inverseMass, NPC_Colour colour, NPC* newNpc);
+			NPC*AddNPCToWorld(const Vector3& position, float radius, float inverseMass, NPC_Colour colour);
 			
 			GameObject* AddFloorToWorld(const Vector3& position);
 			GameObject* AddSphereToWorld(const Vector3& position, float radius, float inverseMass = 10.0f);

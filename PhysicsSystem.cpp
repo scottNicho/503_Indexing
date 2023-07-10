@@ -354,6 +354,7 @@ void PhysicsSystem::BroadPhaseBppTree() {
 		if (!(*i)->GetBroadphaseAABB(halfSizes)) {
 			continue;
 		}
+		(*i)->GetBoundingVolume();
 		Vector3 pos = (*i)->GetTransform().GetPosition();
 		Vector2 flatPos = { pos.x,pos.z };
 		// Compute the minimum z value for this game object i!
