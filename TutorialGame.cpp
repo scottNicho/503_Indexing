@@ -550,7 +550,7 @@ StateGameObject* NCL::CSC8503::TutorialGame::AddStateObjectToWorld(const Vector3
 }
 
 void TutorialGame::InitDefaultFloor() {
-	AddFloorToWorld(Vector3(20, 20, 20));
+	AddFloorToWorld(Vector3(100, 20, 100));
 }
 
 void TutorialGame::InitGameExamples() {
@@ -560,7 +560,8 @@ void TutorialGame::InitGameExamples() {
 	//AddKeyToWorld(Vector3(15, -15, 20), Vector3(1, 1, 1), 1.0f);
 	//AddDoorToWorld(Vector3(10, -15, 0), Vector3(1, 2, 1), 0.0f);
 	//coins->InitCollectableGridWorld(2, 2, 10, 10, .2f, this);
-	player->Init("Goaty",Vector3(80, 40, 50), charMesh, basicShader, world);
+	//player->Init("Goaty",Vector3(80, 40, 50), charMesh, basicShader, world);
+	player->Init("Goaty", Vector3(100, 40, 100), charMesh, basicShader, world); //exact floor center 
 	player->GetRenderObject()->SetColour(Vector4(0, 1, 0, 1));
 	
 	//enemy = new Enemy(world,true);    ihuwohf;wiehwo

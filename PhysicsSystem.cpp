@@ -337,87 +337,67 @@ void PhysicsSystem::BroadPhaseQuadTree() {
 }
 
 #include"BPTree.h"
-constexpr float back_transformation_scaling_value = 10.0;
+constexpr float back_transformation_scaling_value = 50.0;
 
 void PhysicsSystem::BroadPhaseBppTree() {
-	Vector3 low;
-	Vector3 high;
-	broadphaseCollisions.clear();
+
+
+
 	//QuadTree <GameObject*> tree(Vector2(1024, 1024), 7, 6);
 	
-	// Please remember the smallest and the greatest z-curve value here!
-	unsigned long long min_z_value = std::numeric_limits<int>::max();
 
+	broadphaseCollisions.clear();
+	collisions_being_checked.clear();
+
+	// BEGIN: part to be moved in the constructor, but only in the most recent version of the code!
+	min_z_value = std::numeric_limits<unsigned long long>::max();
+	//Vector3 low;
+	//Vector3 high;
 	std::vector <GameObject*>::const_iterator first;
 	std::vector <GameObject*>::const_iterator last;
 	gameWorld.GetObjectIterators(first, last);
+	//std::unordered_map< GameObject*, std::set<unsigned long long>> points;
 	for (auto i = first; i != last; ++i) {
-		Vector3 halfSizes;
-		if (!(*i)->GetBroadphaseAABB(halfSizes)) {
-			continue;
-		}
-		//(*i)->GetBoundingVolume();
-		Vector3 pos = (*i)->GetTransform().GetPosition();
-
-		/*Vector3 halfSize2;
-		if (!(*i)->GetBroadphaseAABB(halfSize2)) {
-			continue;
-		}*/
-		low = (((*i)->GetTransform().GetPosition()) - halfSizes) / back_transformation_scaling_value;
-		high = (((*i)->GetTransform().GetPosition()) + halfSizes) / back_transformation_scaling_value;
-
-		int low_x, low_z, high_x, high_z;
-		unsigned int low_fx, low_fz, high_fx, high_fz;
-		low_x = (int)std::floorf(std::min(low.x, high.x));
-		high_x = (int)std::ceilf(std::max(low.x, high.x));
-		low_z = (int)std::floorf(std::min(low.z, high.z));
-		high_z = (int)std::ceilf(std::max(low.z, high.z));
-
-#define CD(low_x, low_fx) \
-		if (low_x < 0) {\
-			low_fx = (std::numeric_limits<int>::max()) + low_x;\
-		}\
-		else {\
-			low_fx = (unsigned int)(std::numeric_limits<int>::max()) + (unsigned int)low_x;\
-		}\
-
-		CD(low_x, low_fx)
-			CD(low_z, low_fz)
-			CD(high_x, high_fx)
-			CD(high_z, high_fz)
-		
-		(*i)->ClearZValues();
-		for (unsigned int x = low_fx; x <= high_fx; x++) {
-			for (unsigned int z = low_fz; z <= high_fz; z++) {
-				long long Z_Value = encode_morton_2d(x, z);
-				(*i)->SetZvalue(Z_Value); // set the Z value
-				if (Z_Value < min_z_value) {
-					min_z_value = Z_Value;     //set  the new minimum
-				}
-				bptree = insert(bptree, Z_Value, (void*)*i);
-			}
-		}
-		//Vector2 flatPos = { pos.x,pos.z };
-		// Compute the minimum z value for this game object i!
+		(*i)->ClearZValues(); // ONly in this old logic! Because, we know the bptree is empty, and therefore, has no previous point
+		InsertGameObjectIntoBTree(*i);
 	}
+	// END: part to be moved...
 
+
+	//exit(1);
+
+	/*auto itSet = points.begin();
+	auto& setId1 = itSet->second;
+	itSet++;
+	auto& setId2 = itSet->second;
+	std::vector<unsigned long long> result;
+	std::set_intersection(setId1.begin(), setId1.end(), setId2.begin(), setId2.end(), std::back_inserter(result));
+	*/
+	std::pair<GameObject*, GameObject*> cp;
 	int i;
 	std::vector<GameObject*> v;
-	node* n = find_leaf(bptree, min_z_value, true);// Finding the element from the tree
+	node* n = find_leaf(bptree, min_z_value, false);// Finding the element from the tree
 	if (n == nullptr)
 		return; // Nothing was found
 	for (i = 0; i < n->num_keys && (unsigned long long)n->keys[i] < (unsigned long long)min_z_value; i++) // getting the key within the node if exists
 		;
 	if (i == n->num_keys)
-		return; // Nothing was found: beyon the set of elements
+		return; // Nothing was found: beyond the set of elements
 
-	int CurrentZ = n->keys[i];
+
+	unsigned long long CurrentZ = n->keys[i];
 	//std::vector<GameObject*> LastObjects{};
 
 	while (n != nullptr) {
 		// TASK: collect in v all the game objects, n->pointers[i], having all the same z value, n->keys[i]
 
-		while ((n->keys[i] == CurrentZ) && (i < n->num_keys)) {
+		/*if (std::lower_bound(result.begin(), result.end(), CurrentZ) == result.end()) {
+			std::cout << "not in intersection!" << std::endl;
+		} else {
+			std::cout << "in intersection!" << std::endl;
+		}*/
+
+		while ((n->keys[i] == CurrentZ) && (i < n->num_keys)) { 
 			v.push_back(static_cast<GameObject*>(n->pointers[i]));
 			i++;
 		}
@@ -425,16 +405,21 @@ void PhysicsSystem::BroadPhaseBppTree() {
 		auto next_leaf = static_cast<node*>(n->pointers[n->order - 1]);
 
 		if (((i == n->num_keys) && !next_leaf) || (((i != n->num_keys)) && (n->keys[i] != CurrentZ))) {
-			// As soon as you detect a new different key, that is, as soon as you finish scanning all the nodes with the same z value,
-			// Do a cross product across all the pointers associated to it
-			CollisionDetection::CollisionInfo info;
-			for (int j = 0; j < v.size(); j++)
-				for (int k = 0; k < j; k++) {
-					info.a = std::min(v.at(i), v.at(j));
-					info.b = std::max(v.at(i), v.at(j));
-					broadphaseCollisions.insert(info);
-				}
-			v.clear();
+			std::sort(v.begin(), v.end());
+			v.erase(std::unique(v.begin(), v.end()), v.end());
+			if (v.size() > 1) {
+				// As soon as you detect a new different key, that is, as soon as you finish scanning all the nodes with the same z value,
+				// Do a cross product across all the pointers associated to it
+				CollisionDetection::CollisionInfo info;
+				for (int j = 0; j < v.size(); j++)
+					for (int k = 0; k < j; k++) {
+						info.a = cp.first = std::min(v.at(i), v.at(j));
+						info.b = cp.second =  std::max(v.at(i), v.at(j));
+						if (collisions_being_checked.insert(cp).second)
+							broadphaseCollisions.insert(info);
+					}
+				v.clear();
+			}
 		}
 
 		/*for (; i < n->num_keys; i++) { // Iterating over the existing elements
@@ -542,11 +527,156 @@ void PhysicsSystem::BroadPhaseBppTree() {
 		}
 	}
 #endif 
+
+
 	// Old way: delete the tree all the times
+	// New code: only to be called in the destructor
 	destroy_tree(bptree);
 	bptree = nullptr;
 }
 
+void PhysicsSystem::InsertGameObjectIntoBTree(GameObject* gameObject, bool check_containment) {
+	Vector3 halfSizes;
+	if (!(gameObject)->GetBroadphaseAABB(halfSizes)) {
+		return;
+	}
+	//(*i)->GetBoundingVolume();
+	Vector3 pos = (gameObject)->GetTransform().GetPosition();
+
+	/*Vector3 halfSize2;
+	if (!(*i)->GetBroadphaseAABB(halfSize2)) {
+		continue;
+	}*/
+	Vector3 low = (((gameObject)->GetTransform().GetPosition()) - halfSizes) / back_transformation_scaling_value;
+	Vector3 high = (((gameObject)->GetTransform().GetPosition()) + halfSizes) / back_transformation_scaling_value;
+
+	int low_x, low_z, high_x, high_z;
+	unsigned int low_fx, low_fz, high_fx, high_fz;
+	low_x = (int)std::floorf(std::min(low.x, high.x));
+	high_x = (int)std::ceilf(std::max(low.x, high.x));
+	low_z = (int)std::floorf(std::min(low.z, high.z));
+	high_z = (int)std::ceilf(std::max(low.z, high.z));
+
+#define CD(low_x, low_fx) \
+		if (low_x < 0) {\
+			low_fx = (std::numeric_limits<int>::max()) + low_x;\
+		}\
+		else {\
+			low_fx = (unsigned int)(std::numeric_limits<int>::max()) + (unsigned int)low_x;\
+		}\
+
+	CD(low_x, low_fx)
+		CD(low_z, low_fz)
+		CD(high_x, high_fx)
+		CD(high_z, high_fz)
+
+	auto& old_z_values = (gameObject)->GetZvalue();
+	std::set<unsigned long long> new_set_values;
+	//std::cout << "GO: " << *i << std::endl;
+	for (unsigned int x = low_fx; x <= high_fx; x++) {
+		for (unsigned int z = low_fz; z <= high_fz; z++) {
+			unsigned long long Z_Value = encode_morton_2d(x, z);
+			if (check_containment && old_z_values.contains(Z_Value)) continue;
+			if (Z_Value < min_z_value) {
+				min_z_value = Z_Value;     //set  the new minimum
+			}
+			new_set_values.insert(Z_Value);
+		}
+	}
+
+	auto old_first = old_z_values.begin();
+	auto last1 = old_z_values.end();
+	auto novel_first = new_set_values.begin();
+	auto last2 = new_set_values.end();
+	while (old_first != last1) {
+		if ((novel_first == last2) && check_containment) {
+			while (old_first != last1) {
+				RemoveGameObjectWithZValue(gameObject, *old_first);
+				old_first++;
+			}
+		}
+		if (*old_first > *novel_first) {
+			bptree = insert(bptree, *novel_first, (void*)gameObject);
+		}
+		else if (*old_first < *novel_first) {
+			if (check_containment) {
+				RemoveGameObjectWithZValue(gameObject, *old_first);
+			}
+		}
+		else {
+			// Elements at intersection
+		}
+	}
+	while (novel_first != last2) {
+		bptree = insert(bptree, *novel_first, (void*)gameObject);
+		novel_first++;
+	}
+	//std::copy(novel_first, last2, std::back_inserter(out));
+
+
+	(gameObject)->ClearZValues();
+	for (const auto z : new_set_values) gameObject->SetZvalue(z);
+}
+
+
+bool PhysicsSystem::RemoveGameObjectWithZValue(GameObject* gameObject, unsigned long long Z_value) {
+	bool found = false;
+	{
+		// Removal from BPTRee
+		node* n = find_leaf(bptree, Z_value, false);
+
+		int i;
+		if (n == nullptr)
+			return false; // Nothing was found
+		for (i = 0; i < n->num_keys && (unsigned long long)n->keys[i] < (unsigned long long) Z_value; i++) // getting the key within the node if exists
+			;
+		if (i == n->num_keys)
+			return false; // Nothing was found: beyond the set of elements
+
+		//std::vector<GameObject*> LastObjects{};
+
+		while (n != nullptr) {
+			// TASK: collect in v all the game objects, n->pointers[i], having all the same z value, n->keys[i]
+
+			/*if (std::lower_bound(result.begin(), result.end(), CurrentZ) == result.end()) {
+				std::cout << "not in intersection!" << std::endl;
+			} else {
+				std::cout << "in intersection!" << std::endl;
+			}*/
+
+			while ((n->keys[i] == Z_value) && (i < n->num_keys)) {
+				if (static_cast<GameObject*>(n->pointers[i]) == gameObject) {
+					n->pointers[i] = nullptr;// removal
+					found = true;
+					break;
+				}
+				else
+					i++;
+			}
+			if (found) break;
+
+			auto next_leaf = static_cast<node*>(n->pointers[n->order - 1]);
+
+			/*for (; i < n->num_keys; i++) { // Iterating over the existing elements
+				returned_keys[num_found] = n->keys[i];
+				returned_pointers[num_found] = n->pointers[i];
+				num_found++;
+			}*/
+			if (i == n->num_keys) {
+				n = next_leaf; // Moving towards the next leaf
+				i = 0; // re-setting the counter to zero
+			}
+			if (n->keys[i] != Z_value) {
+				n = nullptr;
+			}
+		}
+
+		if (n && found) {
+			// TODO future work: optimisation?
+		}
+	}
+	return found;
+}
 /*
 
 The broadphase will now only give us likely collisions, so we can now go through them,

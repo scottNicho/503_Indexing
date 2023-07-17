@@ -100,6 +100,7 @@ namespace NCL {
 
 		class PhysicsSystem	{
 		public:
+			unsigned long long min_z_value;
 			node* bptree = nullptr;
 			PhysicsSystem(GameWorld& g);
 			~PhysicsSystem();
@@ -120,7 +121,14 @@ namespace NCL {
 
 			void SetDamping(const float& d);
 			float GetDamping() const;
+            void InsertGameObjectIntoBTree(GameObject*i , bool check_containment = false);
+            
+            bool RemoveGameObjectWithZValue(GameObject* gameObject, unsigned long long Z_value);
+				
 		protected:
+
+
+            std::set<std::pair<GameObject*,GameObject*>> collisions_being_checked;
 			void BasicCollisionDetection();
 			void BroadPhaseQuadTree();
 
