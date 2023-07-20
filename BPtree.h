@@ -284,6 +284,7 @@ namespace NCL::CSC8503 {
         struct node* parent;
         bool is_leaf;
         int num_keys;
+        //std::vector<GameObject*> items = {};
         //    struct node *next;
     } node;
 

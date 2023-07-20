@@ -10,6 +10,7 @@
 #include "GameTimer.h"
 #include "Assets.h"
 #include "MenuManager.h"
+#include "PhysicsSystem.h"
 
 
 #include <fstream>
@@ -25,7 +26,7 @@ TutorialGame::TutorialGame()	{
 	renderer = new GameTechRenderer(*world);
 #endif
 
-	physics		= new PhysicsSystem(*world);
+	
 	Vector2 sid = {10,10};
 	myDeltaTime = 0;
 	force = 10;
@@ -40,9 +41,19 @@ TutorialGame::TutorialGame()	{
 	//coins = new Coin(world);
 	player = new Character(gameManager,scoreManager,world);
 	//npcGroup = new NPC_Group(sid,1,10);
-	
-
+	physics = new PhysicsSystem(*world);
 	InitialiseAssets();
+	
+	std::vector <GameObject*>::const_iterator first;
+	std::vector <GameObject*>::const_iterator last;
+	physics->GetGameWorld().GetObjectIterators(first,last);
+	//std::unordered_map< GameObject*, std::set<unsigned long long>> points;
+	for (auto i = first; i != last; ++i) {
+		//(*i)->ClearZValues(); // ONly in this old logic! Because, we know the bptree is empty, and therefore, has no previous point
+		physics->InsertGameObjectIntoBTree(*i);
+		
+	}
+	
 }
 
 void TutorialGame::InitialiseAssets() {
@@ -561,7 +572,7 @@ void TutorialGame::InitGameExamples() {
 	//AddDoorToWorld(Vector3(10, -15, 0), Vector3(1, 2, 1), 0.0f);
 	//coins->InitCollectableGridWorld(2, 2, 10, 10, .2f, this);
 	//player->Init("Goaty",Vector3(80, 40, 50), charMesh, basicShader, world);
-	player->Init("Goaty", Vector3(100, 40, 100), charMesh, basicShader, world); //exact floor center 
+	player->Init("Goaty", Vector3(100, 24, 100), charMesh, basicShader, world); //exact floor center 
 	player->GetRenderObject()->SetColour(Vector4(0, 1, 0, 1));
 	
 	//enemy = new Enemy(world,true);    ihuwohf;wiehwo
