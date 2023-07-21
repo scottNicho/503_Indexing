@@ -1,8 +1,58 @@
 #pragma once
+#ifdef max
+#undef max
+#endif
+#ifdef min
+#undef min
+#endif
+#include "BPtree.h"
 #include "GameWorld.h"
 
 #include <cstdint>
 #include <utility>
+
+template<typename T>
+std::ostream& operator<<(std::ostream& os, const std::set<T>& insertion) {
+    os << '{';
+    auto it = insertion.begin();
+    for (size_t i = 0, N = insertion.size(); i < N; i++) {
+        os << *it;
+        if (i < (N - 1)) os << ", ";
+        it++;
+    }
+    return os << '}';
+}
+
+#include <unordered_set>
+
+template<typename T>
+std::ostream& operator<<(std::ostream& os, const std::unordered_set<T>& insertion) {
+    os << '{';
+    auto it = insertion.begin();
+    for (size_t i = 0, N = insertion.size(); i < N; i++) {
+        os << *it;
+        if (i < (N - 1)) os << ", ";
+        it++;
+    }
+    return os << '}';
+}
+
+template<typename T, typename V>
+std::ostream& operator<<(std::ostream& os, const std::pair<T, V>& insertion) {
+    return os << "<" << insertion.first << ", " << insertion.second << ">";
+}
+
+template<typename T, typename K>
+std::ostream& operator<<(std::ostream& os, const std::map<T, K>& insertion) {
+    os << '{';
+    auto it = insertion.begin();
+    for (size_t i = 0, N = insertion.size(); i < N; i++) {
+        os << it->first << ">" << it->second;
+        if (i < (N - 1)) os << ", ";
+        it++;
+    }
+    return os << '}';
+}
 
 namespace detail
 {
@@ -94,6 +144,9 @@ encode_morton_2d(std::pair<UnsignedInteger, UnsignedInteger> xy)
     return encode_morton_2d(xy.first, xy.second);
 }
 
+#include <map>
+#include <unordered_set>
+
 namespace NCL {
 	namespace CSC8503 {
 		struct node;
@@ -101,9 +154,13 @@ namespace NCL {
 		class PhysicsSystem	{
 		public:
 			unsigned long long min_z_value;
-			node* bptree = nullptr;
+            std::map<unsigned long long, std::unordered_set<GameObject*>> bptree;
+            frozenca::BTreeMap<unsigned long long, std::unordered_set<GameObject*>> bptree2;
+
+			//node* bptree = nullptr;
 			PhysicsSystem(GameWorld& g);
 			~PhysicsSystem();
+            void finalise_initialisation();
 
 			void Clear();
 
@@ -118,12 +175,21 @@ namespace NCL {
 			}
 
 			void SetGravity(const Vector3& g);
-
+            void print_tree() const {
+                for (const auto& [k, v] : bptree) {
+                    std::cout << k << " + {";
+                    for (const auto& value : v)
+                        std::cout << value << ",";
+                    std::cout << "}" << std::endl;
+                }
+            }
 			void SetDamping(const float& d);
 			float GetDamping() const;
             void InsertGameObjectIntoBTree(GameObject*i , bool check_containment = false);
             
             bool RemoveGameObjectWithZValue(GameObject* gameObject, unsigned long long Z_value);
+
+            GameWorld& GetGameWorld() { return gameWorld; }
 				
 		protected:
 
@@ -133,6 +199,9 @@ namespace NCL {
 			void BroadPhaseQuadTree();
 
 			void BroadPhaseBppTree();
+
+            void BroadPhaseInConstantBppTree();
+
 			void NarrowPhase();
 
 			void ClearForces();

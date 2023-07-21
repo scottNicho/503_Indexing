@@ -43,16 +43,17 @@ TutorialGame::TutorialGame()	{
 	//npcGroup = new NPC_Group(sid,1,10);
 	physics = new PhysicsSystem(*world);
 	InitialiseAssets();
+	physics->finalise_initialisation();
 	
-	std::vector <GameObject*>::const_iterator first;
-	std::vector <GameObject*>::const_iterator last;
-	physics->GetGameWorld().GetObjectIterators(first,last);
-	//std::unordered_map< GameObject*, std::set<unsigned long long>> points;
-	for (auto i = first; i != last; ++i) {
-		//(*i)->ClearZValues(); // ONly in this old logic! Because, we know the bptree is empty, and therefore, has no previous point
-		physics->InsertGameObjectIntoBTree(*i);
-		
-	}
+	//std::vector <GameObject*>::const_iterator first;
+	//std::vector <GameObject*>::const_iterator last;
+	//physics->GetGameWorld().GetObjectIterators(first,last);
+	////std::unordered_map< GameObject*, std::set<unsigned long long>> points;
+	//for (auto i = first; i != last; ++i) {
+	//	//(*i)->ClearZValues(); // ONly in this old logic! Because, we know the bptree is empty, and therefore, has no previous point
+	//	physics->InsertGameObjectIntoBTree(*i);
+	//	
+	//}
 	
 }
 
