@@ -97,6 +97,7 @@ namespace NCL {
 			StateGameObject* testStateObject;
 
 			Character* player = nullptr;
+			vector<Character*> heard = {};
 			Enemy* enemy = nullptr;
 			Enemy* goose = nullptr;
 			MenuManager* menuManager;
@@ -104,6 +105,8 @@ namespace NCL {
 			GameManager* gameManager = nullptr;
 			Door* door = nullptr;
 			Coin* coins = nullptr;
+			const unsigned int HeardTimer = 40;
+			int HeardRunningTime;
 
 #ifdef USEVULKAN
 			GameTechVulkanRenderer*	renderer;

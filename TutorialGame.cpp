@@ -11,7 +11,8 @@
 #include "Assets.h"
 #include "MenuManager.h"
 #include "PhysicsSystem.h"
-
+#include <time.h>
+#include <cstdlib>
 
 #include <fstream>
 
@@ -32,6 +33,7 @@ TutorialGame::TutorialGame()	{
 	force = 10;
 	playerRotateSpeed = 0.25f;
 	forceMagnitude	= 10.0f;
+	HeardRunningTime = HeardTimer;
 	useGravity		= true;
 	inSelectionMode = false;
 	scoreManager = new ScoreManager();
@@ -99,6 +101,10 @@ TutorialGame::~TutorialGame()	{
 	delete player;
 
 	delete npcGroup;
+
+	for (auto xi : heard) {
+		delete xi;
+	}
 }
 
 
@@ -148,7 +154,23 @@ void TutorialGame::UpdateGame(float dt) {
 	//if (door) {
 	//	door->Update(dt);
 	//}
-
+	srand(time(0));
+	int ranNum = (static_cast<int>(rand()))% 20;
+	Vector3 newForce{ static_cast<float>(ranNum * 2),0,static_cast<float>(ranNum * 5)};
+	if (HeardRunningTime <= 0) {
+		int muten = 1;
+		for (auto yy : heard) {
+			if (ranNum % muten == 0) {
+				yy->GetPhysicsObject()->AddForce(newForce*muten);
+			}
+			muten++;
+		}
+		HeardRunningTime = HeardTimer;
+	}
+	else
+	{
+		HeardRunningTime--;
+	}
 }
 
 void TutorialGame::UpdateKeys(float myDeltaTime) {
@@ -573,8 +595,19 @@ void TutorialGame::InitGameExamples() {
 	//AddDoorToWorld(Vector3(10, -15, 0), Vector3(1, 2, 1), 0.0f);
 	//coins->InitCollectableGridWorld(2, 2, 10, 10, .2f, this);
 	//player->Init("Goaty",Vector3(80, 40, 50), charMesh, basicShader, world);
+	unsigned int AmountGoats = 7;
+	unsigned int column_Amount = 6;
+	unsigned int row_Amount = 6;
 	player->Init("Goaty", Vector3(100, 24, 100), charMesh, basicShader, world); //exact floor center 
 	player->GetRenderObject()->SetColour(Vector4(0, 1, 0, 1));
+
+	for (int i = 0; i < AmountGoats; ++i) {
+		int  spaceIncrement = 10*i;
+		Character* newCharacter = new Character(nullptr,nullptr,world);
+		newCharacter->Init("next goat", Vector3(100 + spaceIncrement, 24, 100 + spaceIncrement), charMesh, basicShader, world);
+		heard.push_back(static_cast<Character*>(newCharacter));
+	}
+	
 	
 	//enemy = new Enemy(world,true);    ihuwohf;wiehwo
 	//goose = new Enemy(world,false);    kdhqoifwejwoepifjw

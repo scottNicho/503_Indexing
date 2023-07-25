@@ -5,7 +5,7 @@
 #include "Quaternion.h"
 
 #include "Constraint.h"
-
+#include <chrono>
 #include "Debug.h"
 #include "Window.h"
 #include <functional>
@@ -121,7 +121,11 @@ void PhysicsSystem::Update(float dt) {
 		if (useBroadPhase) {
 
 			//BroadPhaseQuadTree();
+			auto startTime = std::chrono::high_resolution_clock::now();
 			BroadPhaseBppTree();
+			auto endTime = std::chrono::high_resolution_clock::now();
+			auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
+			std::cout << "Execution time: " << duration << " ms" << std::endl;
 			//BroadPhaseInConstantBppTree();
 			
 			NarrowPhase();
@@ -363,7 +367,7 @@ void PhysicsSystem::finalise_initialisation() {
 	gameWorld.GetObjectIterators(first, last);
 	//std::unordered_map< GameObject*, std::set<unsigned long long>> points;
 	for (auto i = first; i != last; ++i) {
-		std::cout << (*i)->GetName() << std::endl;
+		//std::cout << (*i)->GetName() << std::endl;
 		(*i)->ClearZValues(); // ONly in this old logic! Because, we know the bptree is empty, and therefore, has no previous point
 		InsertGameObjectIntoBTree(*i);
 	}
@@ -415,7 +419,7 @@ void PhysicsSystem::BroadPhaseBppTree() {
 					if (collisions_being_checked.insert(cp).second)
 						broadphaseCollisions.insert(info);
 				}
-			std::cout << v.size() << std::endl;
+			//std::cout << v.size() << std::endl;
 			//v.clear();
 		}
 	}
