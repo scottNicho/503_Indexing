@@ -19,7 +19,7 @@
 using namespace NCL;
 using namespace CSC8503;
 
-TutorialGame::TutorialGame()	{
+TutorialGame::TutorialGame(CollisionDMethod collMethod)	{
 	world		= new GameWorld();
 #ifdef USEVULKAN
 	renderer	= new GameTechVulkanRenderer(*world);
@@ -27,7 +27,7 @@ TutorialGame::TutorialGame()	{
 	renderer = new GameTechRenderer(*world);
 #endif
 
-	
+	collisionMethode = collMethod;
 	Vector2 sid = {10,10};
 	myDeltaTime = 0;
 	force = 10;
@@ -43,10 +43,31 @@ TutorialGame::TutorialGame()	{
 	//coins = new Coin(world);
 	player = new Character(gameManager,scoreManager,world);
 	//npcGroup = new NPC_Group(sid,1,10);
-	physics = new PhysicsSystem(*world);
+	physics = new PhysicsSystem(*world,collisionMethode);
 	InitialiseAssets();
-	physics->finalise_initialisation();
 	
+	switch (collisionMethode)
+	{
+	case 0:
+		break;
+	case 1:
+		physics->finalise_initialisation();
+		break;
+	case 2:
+		physics->finalise_initialisation();
+		break;
+	case 3:
+		physics->finalise_initialisation();
+		break;
+	case 4:
+		break;
+	case 5:
+		break;
+	default:
+		break;
+	}
+
+
 	//std::vector <GameObject*>::const_iterator first;
 	//std::vector <GameObject*>::const_iterator last;
 	//physics->GetGameWorld().GetObjectIterators(first,last);
@@ -128,6 +149,7 @@ void TutorialGame::UpdateGame(float dt) {
 
 	world->UpdateWorld(dt);
 	renderer->Update(dt);
+
 	physics->Update(dt);
 
 	float cameraX = cameraDist * cos((world->GetMainCamera()->GetYaw() + 270) * 3.14f / 180) + player->GetTransform().GetPosition().x;

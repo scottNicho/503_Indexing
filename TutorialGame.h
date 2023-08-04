@@ -29,9 +29,19 @@ namespace NCL {
 			void OnCollisionEnd(GameObject* otherObject) override;
 		};
 
+		enum CollisionDMethod {
+			None,
+			QuadTreeY,
+			BpTree_const,
+			BpTree,
+			RedBlackTree_const,
+			RedBlackTree
+			
+		};
+
 		class TutorialGame		{
 		public:
-			TutorialGame();
+			TutorialGame(CollisionDMethod collMethod);
 			~TutorialGame();
 
 			virtual void UpdateGame(float dt);
@@ -53,6 +63,8 @@ namespace NCL {
 			void UpdateKeys(float dt);
 
 			void InitWorld();
+
+			
 
 			/*
 			These are some of the world/object creation functions I created when testing the functionality
@@ -144,6 +156,8 @@ namespace NCL {
 			}
 
 			GameObject* PowerUpObj = nullptr;
+			int collisionMethode;
+
 		};
 	}
 }

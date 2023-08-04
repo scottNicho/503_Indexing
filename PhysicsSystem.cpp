@@ -14,9 +14,10 @@
 using namespace NCL;
 using namespace CSC8503;
 
-PhysicsSystem::PhysicsSystem(GameWorld& g) : gameWorld(g)	{
+PhysicsSystem::PhysicsSystem(GameWorld& g, int NewDetectionMethode) : gameWorld(g)	{
 	applyGravity	= false;
 	useBroadPhase	= true;	
+	DetectionMethode = NewDetectionMethode;
 	dTOffset		= 0.0f;
 	globalDamping	= 0.995f;
 	damping = 0.4f;
@@ -120,13 +121,31 @@ void PhysicsSystem::Update(float dt) {
 		IntegrateAccel(realDT); //Update accelerations from external forces
 		if (useBroadPhase) {
 
-			//BroadPhaseQuadTree();
 			auto startTime = std::chrono::high_resolution_clock::now();
-			BroadPhaseBppTree();
+			switch (DetectionMethode)
+			{
+			case(0):
+				break;
+			case(1):
+				BroadPhaseQuadTree();
+				break;
+			case(2):
+				BroadPhaseBppTree();
+				break;
+			case(3):
+				BroadPhaseInConstantBppTree();
+				break;
+			case(4):
+				break;
+			default:
+				break;
+			}
+			
+			
+			
 			auto endTime = std::chrono::high_resolution_clock::now();
 			auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
 			std::cout << "Execution time: " << duration << " ms" << std::endl;
-			//BroadPhaseInConstantBppTree();
 			
 			NarrowPhase();
 		}
@@ -662,6 +681,57 @@ void PhysicsSystem::NarrowPhase() {
 			info.framesLeft = numCollisionFrames;
 			ImpulseResolveCollision(*info.a, *info.b, info.point);
 			allCollisions.insert(info); // insert into our main set
+		}
+	}
+}
+
+void PhysicsSystem::InsertGameObjectIntoRBTree(GameObject* gameObject, bool checkContainment = false) {
+	// Calculate the object's Z value for broadphase grouping
+	unsigned long long Z_value = gameObject->GetZvalue();
+
+	// Insert the object into the RBtree
+	RBtree[Z_value].insert(gameObject);
+
+	// Check for containment in other cells if needed
+	if (checkContainment) {
+		for (const auto& [k, v] : RBtree) {
+			if (k != Z_value && Contains((gameObject->GetBoundingVolume()), k)) {
+				v.insert(gameObject);
+			}
+		}
+	}
+}
+
+bool PhysicsSystem::RemoveGameObjectWithZValue(GameObject* gameObject, unsigned long long Z_value) {
+	auto it = RBtree.find(Z_value);
+	if (it != RBtree.end()) {
+		it->second.erase(gameObject);
+		if (it->second.empty()) {
+			RBtree.erase(it);
+		}
+		return true;
+	}
+	return false;
+}
+
+void PhysicsSystem::BroadPhaseInConstantRBTree() {
+	broadphaseCollisions.clear();
+	collisions_being_checked.clear();
+
+	std::pair<GameObject*, GameObject*> cp;
+	for (const auto& [k, v] : RBtree) {
+		if (v.size() > 1) {
+			std::vector<GameObject*> tmp{ v.begin(), v.end() };
+			CollisionDetection::CollisionInfo info;
+			for (size_t j = 0; j < v.size(); j++) {
+				for (size_t k = 0; k < j; k++) {
+					info.a = cp.first = std::min(tmp.at(j), tmp.at(k));
+					info.b = cp.second = std::max(tmp.at(j), tmp.at(k));
+					if (collisions_being_checked.insert(cp).second)
+						broadphaseCollisions.insert(info);
+				}
+			}
+			std::cout << v.size() << std::endl;
 		}
 	}
 }

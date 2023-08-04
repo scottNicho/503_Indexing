@@ -154,11 +154,11 @@ namespace NCL {
 		class PhysicsSystem	{
 		public:
 			unsigned long long min_z_value;
-            std::map<unsigned long long, std::unordered_set<GameObject*>> bptree;
+            std::map<unsigned long long, std::unordered_set<GameObject*>> RBtree;
             frozenca::BTreeMap<unsigned long long, std::unordered_set<GameObject*>> bptree2;
 
 			//node* bptree = nullptr;
-			PhysicsSystem(GameWorld& g);
+			PhysicsSystem(GameWorld& g,int NewDetectionMethode);
 			~PhysicsSystem();
             void finalise_initialisation();
 
@@ -176,7 +176,7 @@ namespace NCL {
 
 			void SetGravity(const Vector3& g);
             void print_tree() const {
-                for (const auto& [k, v] : bptree) {
+                for (const auto& [k, v] : RBtree) {
                     std::cout << k << " + {";
                     for (const auto& value : v)
                         std::cout << value << ",";
@@ -215,6 +215,10 @@ namespace NCL {
 			void UpdateObjectAABBs();
 
 			void ImpulseResolveCollision(GameObject& a , GameObject&b, CollisionDetection::ContactPoint& p) const;
+            //red black
+            void InsertGameObjectIntoRBTree(GameObject* gameObject, bool checkContainment = false);
+            bool RemoveGameObjectWithZValue(GameObject* gameObject, unsigned long long Z_value);
+            void BroadPhaseInConstantRBTree();
 
 			GameWorld& gameWorld;
 
@@ -229,6 +233,7 @@ namespace NCL {
 			std::vector<CollisionDetection::CollisionInfo> broadphaseCollisionsVec;
 			bool useBroadPhase		= true;
 			int numCollisionFrames	= 5;
+            int DetectionMethode;
 		};
 	}
 }
