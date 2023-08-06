@@ -687,7 +687,7 @@ void PhysicsSystem::NarrowPhase() {
 
 void PhysicsSystem::InsertGameObjectIntoRBTree(GameObject* gameObject, bool checkContainment = false) {
 	// Calculate the object's Z value for broadphase grouping
-	unsigned long long Z_value = gameObject->GetZvalue();
+	unsigned long long Z_value = CalculateZValue(gameObject);
 
 	// Insert the object into the RBtree
 	RBtree[Z_value].insert(gameObject);
@@ -695,6 +695,10 @@ void PhysicsSystem::InsertGameObjectIntoRBTree(GameObject* gameObject, bool chec
 	// Check for containment in other cells if needed
 	if (checkContainment) {
 		for (const auto& [k, v] : RBtree) {
+			unsigned int AABB_size = 0;
+			if (gameObject->GetBoundingVolume()->type == VolumeType::AABB) {
+				AABB_size = (static_cast<AABBVolume>(gameObject->GetBoundingVolume()));
+			}
 			if (k != Z_value && Contains((gameObject->GetBoundingVolume()), k)) {
 				v.insert(gameObject);
 			}

@@ -1,6 +1,7 @@
 #pragma once
 #include "Transform.h"
 #include "CollisionVolume.h"
+#include "AABBVolume.h"
 
 using std::vector;
 
@@ -30,7 +31,7 @@ namespace NCL::CSC8503 {
 			return this;
 		}
 
-		Transform& GetTransform() {
+		 Transform& GetTransform()  {
 			return transform;
 		}
 
@@ -99,13 +100,22 @@ namespace NCL::CSC8503 {
 
 		const long long GetKeyValue()const { return keyValue; }
 
+		void SetAABBObject(AABBVolume* newObject) {
+			AABB_object = newObject;
+		}
+
+		const AABBVolume* GetAABBObject() {
+			return AABB_object;
+		}
+
 	protected:
-		Transform			transform;
+		mutable Transform			transform;
 
 		CollisionVolume*	boundingVolume;
 		PhysicsObject*		physicsObject;
 		RenderObject*		renderObject;
 		NetworkObject*		networkObject;
+		AABBVolume* AABB_object;
 
 		bool		isActive;
 		int			worldID;

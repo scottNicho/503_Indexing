@@ -193,6 +193,10 @@ namespace NCL {
 				
 		protected:
 
+            unsigned long long CalculateZValue(const GameObject* gameObject) {
+                // Call encode_morton_2d with the x and y coordinates of the GameObject
+                return encode_morton_2d(gameObject->GetTransform().GetPosition().x, gameObject->GetTransform().GetPosition().y);
+            }
 
             std::set<std::pair<GameObject*,GameObject*>> collisions_being_checked;
 			void BasicCollisionDetection();

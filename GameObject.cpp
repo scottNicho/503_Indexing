@@ -15,6 +15,7 @@ GameObject::GameObject(string objectName)	{
 	physicsObject	= nullptr;
 	renderObject	= nullptr;
 	networkObject	= nullptr;
+	AABB_object = nullptr;
 }
 
 GameObject::~GameObject()	{
