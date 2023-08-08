@@ -148,33 +148,33 @@ encode_morton_2d(std::pair<UnsignedInteger, UnsignedInteger> xy)
 #include <unordered_set>
 
 namespace NCL {
-	namespace CSC8503 {
-		struct node;
+    namespace CSC8503 {
+        struct node;
 
-		class PhysicsSystem	{
-		public:
-			unsigned long long min_z_value;
+        class PhysicsSystem {
+        public:
+            unsigned long long min_z_value;
             std::map<unsigned long long, std::unordered_set<GameObject*>> RBtree;
             frozenca::BTreeMap<unsigned long long, std::unordered_set<GameObject*>> bptree2;
 
-			//node* bptree = nullptr;
-			PhysicsSystem(GameWorld& g,int NewDetectionMethode);
-			~PhysicsSystem();
+            //node* bptree = nullptr;
+            PhysicsSystem(GameWorld& g, int NewDetectionMethode);
+            ~PhysicsSystem();
             void finalise_initialisation();
 
-			void Clear();
+            void Clear();
 
-			void Update(float dt);
+            void Update(float dt);
 
-			void UseGravity(bool state) {
-				applyGravity = state;
-			}
+            void UseGravity(bool state) {
+                applyGravity = state;
+            }
 
-			void SetGlobalDamping(float d) {
-				globalDamping = d;
-			}
+            void SetGlobalDamping(float d) {
+                globalDamping = d;
+            }
 
-			void SetGravity(const Vector3& g);
+            void SetGravity(const Vector3& g);
             void print_tree() const {
                 for (const auto& [k, v] : RBtree) {
                     std::cout << k << " + {";
@@ -183,62 +183,67 @@ namespace NCL {
                     std::cout << "}" << std::endl;
                 }
             }
-			void SetDamping(const float& d);
-			float GetDamping() const;
-            void InsertGameObjectIntoBTree(GameObject*i , bool check_containment = false);
-            
+            void SetDamping(const float& d);
+            float GetDamping() const;
+            void InsertGameObjectIntoBTree(GameObject* i, bool check_containment = false);
+
             bool RemoveGameObjectWithZValue(GameObject* gameObject, unsigned long long Z_value);
 
             GameWorld& GetGameWorld() { return gameWorld; }
-				
-		protected:
 
-            unsigned long long CalculateZValue(const GameObject* gameObject) {
-                // Call encode_morton_2d with the x and y coordinates of the GameObject
-                return encode_morton_2d(gameObject->GetTransform().GetPosition().x, gameObject->GetTransform().GetPosition().y);
+        protected:
+
+            unsigned long long CalculateZValue(float xPoint, float yPoint) {
+                // Scale and truncate the floating-point coordinates to integers
+                uint32_t scaledX = static_cast<uint32_t>(xPoint );
+                uint32_t scaledY = static_cast<uint32_t>(yPoint );
+
+                // Call encode_morton_2d with the scaled integer coordinates
+                return encode_morton_2d(scaledX, scaledY);
             }
 
-            std::set<std::pair<GameObject*,GameObject*>> collisions_being_checked;
-			void BasicCollisionDetection();
-			void BroadPhaseQuadTree();
+            bool Contains(GameObject* object, Vector3 halfDims, unsigned long long Z_value);
 
-			void BroadPhaseBppTree();
+            std::set<std::pair<GameObject*, GameObject*>> collisions_being_checked;
+            void BasicCollisionDetection();
+            void BroadPhaseQuadTree();
+
+            void BroadPhaseBppTree();
 
             void BroadPhaseInConstantBppTree();
 
-			void NarrowPhase();
+            void NarrowPhase();
 
-			void ClearForces();
+            void ClearForces();
 
-			void IntegrateAccel(float dt);
-			void IntegrateVelocity(float dt);
+            void IntegrateAccel(float dt);
+            void IntegrateVelocity(float dt);
 
-			void UpdateConstraints(float dt);
+            void UpdateConstraints(float dt);
 
-			void UpdateCollisionList();
-			void UpdateObjectAABBs();
+            void UpdateCollisionList();
+            void UpdateObjectAABBs();
 
-			void ImpulseResolveCollision(GameObject& a , GameObject&b, CollisionDetection::ContactPoint& p) const;
+            void ImpulseResolveCollision(GameObject& a, GameObject& b, CollisionDetection::ContactPoint& p) const;
             //red black
             void InsertGameObjectIntoRBTree(GameObject* gameObject, bool checkContainment = false);
-            bool RemoveGameObjectWithZValue(GameObject* gameObject, unsigned long long Z_value);
+            bool RemoveGameObjectWithZZValue(GameObject* gameObject, unsigned long long Z_value);
             void BroadPhaseInConstantRBTree();
 
-			GameWorld& gameWorld;
+            GameWorld& gameWorld;
 
-			bool	applyGravity;
-			Vector3 gravity;
-			float	dTOffset;
-			float	globalDamping;
-			float	damping;
+            bool	applyGravity;
+            Vector3 gravity;
+            float	dTOffset;
+            float	globalDamping;
+            float	damping;
 
-			std::set<CollisionDetection::CollisionInfo> allCollisions;
-			std::set<CollisionDetection::CollisionInfo> broadphaseCollisions;
-			std::vector<CollisionDetection::CollisionInfo> broadphaseCollisionsVec;
-			bool useBroadPhase		= true;
-			int numCollisionFrames	= 5;
+            std::set<CollisionDetection::CollisionInfo> allCollisions;
+            std::set<CollisionDetection::CollisionInfo> broadphaseCollisions;
+            std::vector<CollisionDetection::CollisionInfo> broadphaseCollisionsVec;
+            bool useBroadPhase = true;
+            int numCollisionFrames = 5;
             int DetectionMethode;
-		};
-	}
+        };
+    }
 }
-

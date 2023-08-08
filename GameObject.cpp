@@ -6,26 +6,26 @@
 
 using namespace NCL::CSC8503;
 
-GameObject::GameObject(string objectName)	{
-	name			= objectName;
-	worldID			= -1;
-	keyValue        = 0;
-	isActive		= true;
-	boundingVolume	= nullptr;
-	physicsObject	= nullptr;
-	renderObject	= nullptr;
-	networkObject	= nullptr;
-	AABB_object = nullptr;
+GameObject::GameObject(string objectName) {
+	name = objectName;
+	worldID = -1;
+	keyValue = 0;
+	isActive = true;
+	boundingVolume = nullptr;
+	physicsObject = nullptr;
+	renderObject = nullptr;
+	networkObject = nullptr;
+	//AABB_object = nullptr;
 }
 
-GameObject::~GameObject()	{
+GameObject::~GameObject() {
 	delete boundingVolume;
 	delete physicsObject;
 	delete renderObject;
 	delete networkObject;
 }
 
-bool GameObject::GetBroadphaseAABB(Vector3&outSize) const {
+bool GameObject::GetBroadphaseAABB(Vector3& outSize) const {
 	if (!boundingVolume) {
 		return false;
 	}

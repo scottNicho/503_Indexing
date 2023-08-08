@@ -10,7 +10,7 @@ namespace NCL::CSC8503 {
 	class RenderObject;
 	class PhysicsObject;
 
-	class GameObject	{
+	class GameObject {
 	public:
 		GameObject(std::string name = "");
 		~GameObject();
@@ -31,7 +31,7 @@ namespace NCL::CSC8503 {
 			return this;
 		}
 
-		 Transform& GetTransform()  {
+	    Transform& GetTransform() {
 			return transform;
 		}
 
@@ -70,7 +70,7 @@ namespace NCL::CSC8503 {
 			//std::cout << "OnCollisionEnd event occured!\n";
 		}
 
-		bool GetBroadphaseAABB(Vector3&outsize) const;
+		bool GetBroadphaseAABB(Vector3& outsize) const;
 
 		void UpdateBroadphaseAABB();
 
@@ -100,22 +100,37 @@ namespace NCL::CSC8503 {
 
 		const long long GetKeyValue()const { return keyValue; }
 
-		void SetAABBObject(AABBVolume* newObject) {
+		/*void SetAABBObject(AABBVolume* newObject) {
 			AABB_object = newObject;
 		}
 
 		const AABBVolume* GetAABBObject() {
 			return AABB_object;
+		}*/
+
+		Vector3 GetAABBMax(Vector3 halfDimensions) {
+			
+			Vector3 position = this->GetTransform().GetPosition();
+
+			Vector3 maxVertex = position + halfDimensions;
+			return maxVertex;
+		}
+
+		Vector3 GetAABBMin(Vector3 halfDimensions) {
+			
+			Vector3 position = this->GetTransform().GetPosition();
+
+			Vector3 maxVertex = position - halfDimensions;
+			return maxVertex;
 		}
 
 	protected:
-		mutable Transform			transform;
+	    Transform			transform;
 
-		CollisionVolume*	boundingVolume;
-		PhysicsObject*		physicsObject;
-		RenderObject*		renderObject;
-		NetworkObject*		networkObject;
-		AABBVolume* AABB_object;
+		CollisionVolume* boundingVolume;
+		PhysicsObject* physicsObject;
+		RenderObject* renderObject;
+		NetworkObject* networkObject;
 
 		bool		isActive;
 		int			worldID;
@@ -126,4 +141,3 @@ namespace NCL::CSC8503 {
 		Vector3 broadphaseAABB;
 	};
 }
-
