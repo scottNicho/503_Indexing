@@ -191,11 +191,17 @@ void TutorialGame::UpdateGame(float dt) {
 	srand(time(0));
 	int ranNum = (static_cast<int>(rand()))% 20;
 	Vector3 newForce{ static_cast<float>(ranNum * 2),0,static_cast<float>(ranNum * 5)};
+	
 	if (HeardRunningTime <= 0) {
 		int muten = 1;
 		for (auto yy : heard) {
 			if (ranNum % muten == 0) {
-				yy->GetPhysicsObject()->AddForce(newForce*muten);
+				srand(time(0));
+				float multi = rand()%10;
+				if ((int)multi % 2 == 0) { multi = -multi; }
+				Vector3 forceVec = newForce * muten * multi;
+				if (ranNum % 3 == 0) { forceVec = { -forceVec.z,0,forceVec.x }; }
+				yy->GetPhysicsObject()->AddForce(forceVec);
 			}
 			muten++;
 		}
@@ -652,9 +658,10 @@ void TutorialGame::InitGameExamples() {
 	player->GetRenderObject()->SetColour(Vector4(0, 1, 0, 1));
 
 	for (int i = 0; i < AmountGoats; ++i) {
-		int  spaceIncrement = 10*i;
+		int  spaceIncrement = 3*i;
 		Character* newCharacter = new Character(nullptr,nullptr,world);
 		newCharacter->Init("next goat", Vector3(100 + spaceIncrement, 24, 100 + spaceIncrement), charMesh, basicShader, world);
+		newCharacter->GetRenderObject()->SetColour(Vector4(spaceIncrement/3, 1, spaceIncrement/2, spaceIncrement/4));
 		heard.push_back(static_cast<Character*>(newCharacter));
 	}
 	
