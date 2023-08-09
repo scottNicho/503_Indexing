@@ -11,6 +11,7 @@
 #include <functional>
 #include<iostream>
 #include"BPtree.h"
+#include <fstream>
 using namespace NCL;
 using namespace CSC8503;
 
@@ -117,6 +118,14 @@ void PhysicsSystem::Update(float dt) {
 		}
 	}
 	int iteratorCount = 0;
+
+	std::ofstream csvFile("physics_times.csv", std::ios::app);
+
+	if (!csvFile.is_open()) {
+		std::cerr << "Failed to open CSV file for writing!" << std::endl;
+		return;
+	}
+
 	while (dTOffset > realDT) {
 		IntegrateAccel(realDT); //Update accelerations from external forces
 		if (useBroadPhase) {
@@ -146,8 +155,25 @@ void PhysicsSystem::Update(float dt) {
 			auto endTime = std::chrono::high_resolution_clock::now();
 			auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
 			std::cout << "Execution time: " << duration << " ms" << std::endl;
+			csvFile << duration << "\n";
+			csvFile.close();
+
+			auto narrowPhaseStartTime = std::chrono::high_resolution_clock::now();
 
 			NarrowPhase();
+
+			// Calculate narrow phase duration
+			auto narrowPhaseEndTime = std::chrono::high_resolution_clock::now();
+			auto narrowPhaseDuration = std::chrono::duration_cast<std::chrono::milliseconds>(
+				narrowPhaseEndTime - narrowPhaseStartTime).count();
+			std::ofstream narrowPhaseFile("narrow_phase_times.csv", std::ios_base::app);
+			if (narrowPhaseFile.is_open()) {
+				narrowPhaseFile << narrowPhaseDuration << "\n";
+				narrowPhaseFile.close();
+			}
+			else {
+				std::cerr << "Unable to open narrow_phase_times.csv for writing.\n";
+			}
 		}
 		else {
 			BasicCollisionDetection();

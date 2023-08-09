@@ -43,7 +43,19 @@ TutorialGame::TutorialGame(CollisionDMethod collMethod)	{
 	//coins = new Coin(world);
 	player = new Character(gameManager,scoreManager,world);
 	//npcGroup = new NPC_Group(sid,1,10);
+	std::ofstream csvFile("Constructor Time.csv", std::ios::app);
+
+	if (!csvFile.is_open()) {
+		std::cerr << "Failed to open Constructor Time CSV file for writing!" << std::endl;
+		return;
+	}
+	auto startConstructorTime = std::chrono::high_resolution_clock::now();
 	physics = new PhysicsSystem(*world,collisionMethode);
+	auto endConstructorTime = std::chrono::high_resolution_clock::now();
+	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endConstructorTime - startConstructorTime).count();
+	csvFile << duration << "\n";
+	csvFile.close();
+
 	InitialiseAssets();
 	
 	switch (collisionMethode)
@@ -267,7 +279,7 @@ GameObject* TutorialGame::AddFloorToWorld(const Vector3& position) {
 
 	floor->SetName("floor");
 	floor->bTriggerDelete = true;
-	Vector3 floorSize = Vector3(600, 2, 600);
+	Vector3 floorSize = Vector3(200, 2, 200);
 	AABBVolume* volume = new AABBVolume(floorSize);
 	floor->SetBoundingVolume((CollisionVolume*)volume);
 	floor->GetTransform()
@@ -280,8 +292,23 @@ GameObject* TutorialGame::AddFloorToWorld(const Vector3& position) {
 	floor->GetPhysicsObject()->SetInverseMass(0);
 	floor->GetPhysicsObject()->InitCubeInertia();
 	floor->GetPhysicsObject()->SetElasticity(0.0f);
-
 	world->AddGameObject(floor);
+	//wall 1 & 2
+	Vector3 Wall1Dim = { floorSize.x,30,2 };
+	Vector3 floorXForward = { 0,Wall1Dim.y,floorSize.x };
+	Vector3 WallPos1 = position + (floorXForward );
+	AddCubeToWorld(WallPos1, Wall1Dim, 0);
+	Vector3 floorXBackwards = { 0,Wall1Dim.y,-floorSize.x };
+	Vector3 WallPos2 = position + (floorXBackwards);
+	AddCubeToWorld(WallPos2, Wall1Dim, 0);
+	//wall 3 & 4
+	Vector3 Wall3Dim = { 2,30,floorSize.x };
+	Vector3 floorZForward = { floorSize.x,Wall1Dim.y,0 };
+	Vector3 WallPos3 = position + (floorZForward);
+	AddCubeToWorld(WallPos3, Wall3Dim, 0);
+	Vector3 floorZBackwards = { -floorSize.x,Wall1Dim.y,0 };
+	Vector3 WallPos4 = position + (floorZBackwards);
+	AddCubeToWorld(WallPos4, Wall3Dim, 0);
 
 	return floor;
 }
@@ -437,6 +464,7 @@ GameObject* TutorialGame::AddCubeToWorld(const Vector3& position, Vector3 dimens
 	GameObject* cube = new GameObject();
 	cube->SetName("cube");
 	AABBVolume* volume = new AABBVolume(dimensions);
+	//cube->SetAABBObject(volume);
 	cube->SetBoundingVolume((CollisionVolume*)volume);
 
 	cube->GetTransform()
@@ -629,6 +657,7 @@ void TutorialGame::InitGameExamples() {
 		newCharacter->Init("next goat", Vector3(100 + spaceIncrement, 24, 100 + spaceIncrement), charMesh, basicShader, world);
 		heard.push_back(static_cast<Character*>(newCharacter));
 	}
+	
 	
 	
 	//enemy = new Enemy(world,true);    ihuwohf;wiehwo
