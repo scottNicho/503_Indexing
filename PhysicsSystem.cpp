@@ -108,6 +108,7 @@ void PhysicsSystem::Update(float dt) {
 	t.GetTimeDeltaSeconds();
 	Vector3 still = { 0,0,0 };
 	if (useBroadPhase) {
+		//add statment for diffrent collision structures 
 		UpdateObjectAABBs();
 		for (GameObject* obj : GetGameWorld().GetGameObjects()) {
 			if (obj->GetPhysicsObject()->GetLinearVelocity() != still) {
@@ -142,7 +143,7 @@ void PhysicsSystem::Update(float dt) {
 				BroadPhaseBppTree();
 				break;
 			case(3):
-				BroadPhaseInConstantBppTree();
+				BroadPhaseNotConstantBppTree();
 				break;
 			case(4):
 				break;
@@ -556,7 +557,7 @@ void PhysicsSystem::BroadPhaseBppTree() {
 }
 
 
-void PhysicsSystem::BroadPhaseInConstantBppTree() {
+void PhysicsSystem::BroadPhaseNotConstantBppTree() {
 	broadphaseCollisions.clear();
 	collisions_being_checked.clear();
 
@@ -571,9 +572,9 @@ void PhysicsSystem::BroadPhaseInConstantBppTree() {
 			std::vector<GameObject*> tmp{ v.begin(), v.end() };
 			CollisionDetection::CollisionInfo info;
 			for (int j = 0; j < v.size(); j++)
-				for (int k = 0; k < j; k++) {
-					info.a = cp.first = std::min(tmp.at(j), tmp.at(j));
-					info.b = cp.second = std::max(tmp.at(j), tmp.at(j));
+				for (int k = j +1; k < v.size(); k++) {
+					info.a = cp.first = std::min(tmp.at(j), tmp.at(k));
+					info.b = cp.second = std::max(tmp.at(j), tmp.at(k));
 					if (collisions_being_checked.insert(cp).second)
 						broadphaseCollisions.insert(info);
 				}

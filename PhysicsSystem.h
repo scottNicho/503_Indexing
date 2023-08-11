@@ -210,7 +210,7 @@ namespace NCL {
 
             void BroadPhaseBppTree();
 
-            void BroadPhaseInConstantBppTree();
+            void BroadPhaseNotConstantBppTree();
 
             void NarrowPhase();
 

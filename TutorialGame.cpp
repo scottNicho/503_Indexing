@@ -63,7 +63,7 @@ TutorialGame::TutorialGame(CollisionDMethod collMethod)	{
 	case 0:
 		break;
 	case 1:
-		physics->finalise_initialisation();
+		//physics->finalise_initialisation();
 		break;
 	case 2:
 		physics->finalise_initialisation();
@@ -72,6 +72,7 @@ TutorialGame::TutorialGame(CollisionDMethod collMethod)	{
 		physics->finalise_initialisation();
 		break;
 	case 4:
+		physics->finalise_initialisation();
 		break;
 	case 5:
 		break;
@@ -651,7 +652,7 @@ void TutorialGame::InitGameExamples() {
 	//AddDoorToWorld(Vector3(10, -15, 0), Vector3(1, 2, 1), 0.0f);
 	//coins->InitCollectableGridWorld(2, 2, 10, 10, .2f, this);
 	//player->Init("Goaty",Vector3(80, 40, 50), charMesh, basicShader, world);
-	unsigned int AmountGoats = 7;
+	unsigned int AmountGoats = 0;
 	unsigned int column_Amount = 6;
 	unsigned int row_Amount = 6;
 	player->Init("Goaty", Vector3(100, 24, 100), charMesh, basicShader, world); //exact floor center 

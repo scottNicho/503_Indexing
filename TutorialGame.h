@@ -33,7 +33,7 @@ namespace NCL {
 			None,
 			QuadTreeY,
 			BpTree_const,
-			BpTree,
+			BpTree_NotConst,
 			RedBlackTree_const,
 			RedBlackTree
 			
