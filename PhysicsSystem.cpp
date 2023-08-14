@@ -146,6 +146,7 @@ void PhysicsSystem::Update(float dt) {
 				BroadPhaseNotConstantBppTree();
 				break;
 			case(4):
+				BroadPhaseConstantRBTree();
 				break;
 			default:
 				break;
@@ -424,6 +425,20 @@ void PhysicsSystem::finalise_initialisation() {
 	// end added construction
 }
 
+void PhysicsSystem::RedBlack_initialisation() {
+	min_z_value = std::numeric_limits<unsigned long long>::max();
+	Vector3 low;
+	Vector3 high;
+	std::vector<GameObject*>::const_iterator first;
+	std::vector<GameObject*>::const_iterator last;
+	gameWorld.GetObjectIterators(first, last);
+
+	for (auto i = first; i != last; ++i) {
+		(*i)->ClearZValues();
+		InsertGameObjectIntoRBTree(*i);
+	}
+}
+
 void PhysicsSystem::BroadPhaseBppTree() {
 
 	//QuadTree <GameObject*> tree(Vector2(1024, 1024), 7, 6);
@@ -569,7 +584,7 @@ void PhysicsSystem::BroadPhaseNotConstantBppTree() {
 	std::pair<GameObject*, GameObject*> cp;
 	for (const auto& [k, v] : bptree2) {
 		if (v.size() > 1) {
-			std::vector<GameObject*> tmp{ v.begin(), v.end() };
+   			std::vector<GameObject*> tmp{ v.begin(), v.end() };
 			CollisionDetection::CollisionInfo info;
 			for (int j = 0; j < v.size(); j++)
 				for (int k = j +1; k < v.size(); k++) {
@@ -704,6 +719,12 @@ void PhysicsSystem::NarrowPhase() {
 	for (std::set <CollisionDetection::CollisionInfo >::iterator i = broadphaseCollisions.begin();
 		i != broadphaseCollisions.end(); ++i) {
 		CollisionDetection::CollisionInfo info = *i;
+		if (info.a->GetName() == "Goaty"|| info.b->GetName() == "Goaty") {
+			if (info.a->GetName() == "floor" || info.b->GetName() == "floor")
+			{
+				std::cout << "Goat & floor" << std::endl;
+			};
+		} 
 		if (CollisionDetection::ObjectIntersection(info.a, info.b, info)) {
 			info.framesLeft = numCollisionFrames;
 			ImpulseResolveCollision(*info.a, *info.b, info.point);
@@ -739,14 +760,14 @@ bool PhysicsSystem::RemoveGameObjectWithZZValue(GameObject* gameObject, unsigned
 	if (it != RBtree.end()) {
 		it->second.erase(gameObject);
 		if (it->second.empty()) {
-			RBtree.erase(it);
+			//RBtree.erase(it);
 		}
 		return true;
 	}
 	return false;
 }
 
-void PhysicsSystem::BroadPhaseInConstantRBTree() {
+void PhysicsSystem::BroadPhaseConstantRBTree() {
 	broadphaseCollisions.clear();
 	collisions_being_checked.clear();
 
@@ -755,6 +776,18 @@ void PhysicsSystem::BroadPhaseInConstantRBTree() {
 		if (v.size() > 1) {
 			std::vector<GameObject*> tmp{ v.begin(), v.end() };
 			CollisionDetection::CollisionInfo info;
+
+			Vector3 nullVec = { 0,0,0 };
+			// Insert new game objects into the RBTree here
+			for (GameObject* obj : GetGameWorld().GetGameObjects()) {
+				if (obj->GetPhysicsObject()->GetLinearVelocity() != nullVec) {
+					InsertGameObjectIntoRBTree(obj, true);
+				}
+				else {
+					//RemoveGameObjectWithZZValue(obj, k);
+				}
+			}
+
 			for (size_t j = 0; j < v.size(); j++) {
 				for (size_t k = 0; k < j; k++) {
 					info.a = cp.first = std::min(tmp.at(j), tmp.at(k));

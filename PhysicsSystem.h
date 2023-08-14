@@ -191,6 +191,9 @@ namespace NCL {
 
             GameWorld& GetGameWorld() { return gameWorld; }
 
+            //red black
+            void RedBlack_initialisation();
+
         protected:
 
             unsigned long long CalculateZValue(float xPoint, float yPoint) {
@@ -228,7 +231,7 @@ namespace NCL {
             //red black
             void InsertGameObjectIntoRBTree(GameObject* gameObject, bool checkContainment = false);
             bool RemoveGameObjectWithZZValue(GameObject* gameObject, unsigned long long Z_value);
-            void BroadPhaseInConstantRBTree();
+            void BroadPhaseConstantRBTree();
 
             GameWorld& gameWorld;
 
