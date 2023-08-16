@@ -156,7 +156,7 @@ void PhysicsSystem::Update(float dt) {
 
 			auto endTime = std::chrono::high_resolution_clock::now();
 			auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
-			std::cout << "Execution time: " << duration << " ms" << std::endl;
+			//std::cout << "Execution time: " << duration << " ms" << std::endl;
 			csvFile << duration << "\n";
 			csvFile.close();
 
@@ -593,7 +593,7 @@ void PhysicsSystem::BroadPhaseNotConstantBppTree() {
 					if (collisions_being_checked.insert(cp).second)
 						broadphaseCollisions.insert(info);
 				}
-			std::cout << v.size() << std::endl;
+			//std::cout << v.size() << std::endl;
 			//v.clear();
 		}
 	}
@@ -719,12 +719,28 @@ void PhysicsSystem::NarrowPhase() {
 	for (std::set <CollisionDetection::CollisionInfo >::iterator i = broadphaseCollisions.begin();
 		i != broadphaseCollisions.end(); ++i) {
 		CollisionDetection::CollisionInfo info = *i;
-		if (info.a->GetName() == "Goaty"|| info.b->GetName() == "Goaty") {
+		/*if (info.a->GetName() == "Goaty"|| info.b->GetName() == "Goaty") {
 			if (info.a->GetName() == "floor" || info.b->GetName() == "floor")
 			{
 				std::cout << "Goat & floor" << std::endl;
 			};
 		} 
+		if (info.a->GetName() == "Goaty" || info.b->GetName() == "Goaty") {
+			if (info.a->GetName() == "next goat" || info.b->GetName() == "next goat")
+			{
+				std::cout << "Goat & next goat" << std::endl;
+			};
+		}
+		if (info.a->GetName() == "floor" || info.b->GetName() == "floor") {
+			if (info.a->GetName() == "next goat" || info.b->GetName() == "next goat")
+			{
+				std::cout << "floor & next goat" << std::endl;
+			};
+		}*/
+		if (info.a->GetName() == "next goat") {
+			std::cout << info.b->GetName() << std::endl;
+		}
+
 		if (CollisionDetection::ObjectIntersection(info.a, info.b, info)) {
 			info.framesLeft = numCollisionFrames;
 			ImpulseResolveCollision(*info.a, *info.b, info.point);
@@ -771,33 +787,49 @@ void PhysicsSystem::BroadPhaseConstantRBTree() {
 	broadphaseCollisions.clear();
 	collisions_being_checked.clear();
 
+	Vector3 nullVec = {0,0,0};
 	std::pair<GameObject*, GameObject*> cp;
+	auto ItEntry = RBtree.begin();
+	if (ItEntry != RBtree.end()) {
+		auto floor = *(((*ItEntry).second).begin());
+		Vector3 floorHalfSize = (((AABBVolume&)*(floor->GetBoundingVolume())).GetHalfDimensions());
+		++ItEntry; // Move to the second term
+
+		for (; ItEntry != RBtree.end(); ++ItEntry) {
+			auto nextObject = *(((*ItEntry).second).begin());
+			auto nextObjectZValue = (((*ItEntry).first));
+			// Check collision between floor and nextObject
+			if (Contains(floor, floorHalfSize,nextObjectZValue)) {
+				// Add the collision to broadphaseCollisions
+				CollisionDetection::CollisionInfo info;
+				info.a = floor;
+				info.b = nextObject;
+				broadphaseCollisions.insert(info);
+			};
+		}
+	}
+
 	for (const auto& [k, v] : RBtree) {
 		if (v.size() > 1) {
 			std::vector<GameObject*> tmp{ v.begin(), v.end() };
 			CollisionDetection::CollisionInfo info;
 
-			Vector3 nullVec = { 0,0,0 };
-			// Insert new game objects into the RBTree here
-			for (GameObject* obj : GetGameWorld().GetGameObjects()) {
-				if (obj->GetPhysicsObject()->GetLinearVelocity() != nullVec) {
-					InsertGameObjectIntoRBTree(obj, true);
-				}
-				else {
-					//RemoveGameObjectWithZZValue(obj, k);
-				}
-			}
-
+			// Check all other objects against each other
 			for (size_t j = 0; j < v.size(); j++) {
 				for (size_t k = 0; k < j; k++) {
 					info.a = cp.first = std::min(tmp.at(j), tmp.at(k));
 					info.b = cp.second = std::max(tmp.at(j), tmp.at(k));
-					if (collisions_being_checked.insert(cp).second)
-						broadphaseCollisions.insert(info);
+
+					// Check containment before adding collision
+					if (Contains(info.a, ((AABBVolume&)*((info.a)->GetBoundingVolume())).GetHalfDimensions(), k)) {
+						if (collisions_being_checked.insert(cp).second) {
+							broadphaseCollisions.insert(info);
+						};
+
+					};
 				}
 			}
-			std::cout << v.size() << std::endl;
-		}
+		} 
 	}
 }
 
@@ -814,7 +846,7 @@ bool PhysicsSystem::Contains(GameObject* object,Vector3 halfDims ,unsigned long 
 	// Check if the AABB contains any part of the cell
 	// The AABB contains the cell if any of its corners are within the cell boundaries
 	if (MinVertex.x <= cellX && MinVertex.y <= cellY &&
-		maxVertex.x >= cellX && maxVertex.y >= cellY) {
+		maxVertex.x >= cellX && (maxVertex.y + 400) >= cellY) {
 		return true;
 	}
 

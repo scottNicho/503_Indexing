@@ -182,6 +182,7 @@ namespace NCL {
                         std::cout << value << ",";
                     std::cout << "}" << std::endl;
                 }
+                std::cout << "End tree" << std::endl;
             }
             void SetDamping(const float& d);
             float GetDamping() const;

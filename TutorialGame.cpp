@@ -270,8 +270,9 @@ void TutorialGame::InitWorld() {
 
 	//InitMixedGridWorld(4,4, 3.0f, 3.0f);
 	//InitSphereGridWorld(5,5,10,10,2); tttiytfiytfgiuyg
-	InitGameExamples();
 	InitDefaultFloor();
+	InitGameExamples();
+	
 
 	//testStateObject = AddStateObjectToWorld(Vector3(0, 30, 0));
 }
@@ -305,17 +306,17 @@ GameObject* TutorialGame::AddFloorToWorld(const Vector3& position) {
 	Vector3 floorXForward = { 0,Wall1Dim.y,floorSize.x };
 	Vector3 WallPos1 = position + (floorXForward );
 	AddCubeToWorld(WallPos1, Wall1Dim, 0);
-	Vector3 floorXBackwards = { 0,Wall1Dim.y,-floorSize.x };
+	/*Vector3 floorXBackwards = { 0,Wall1Dim.y,-floorSize.x };
 	Vector3 WallPos2 = position + (floorXBackwards);
-	AddCubeToWorld(WallPos2, Wall1Dim, 0);
+	AddCubeToWorld(WallPos2, Wall1Dim, 0);*/
 	//wall 3 & 4
-	Vector3 Wall3Dim = { 2,30,floorSize.x };
+	/*Vector3 Wall3Dim = { 2,30,floorSize.x };
 	Vector3 floorZForward = { floorSize.x,Wall1Dim.y,0 };
 	Vector3 WallPos3 = position + (floorZForward);
 	AddCubeToWorld(WallPos3, Wall3Dim, 0);
 	Vector3 floorZBackwards = { -floorSize.x,Wall1Dim.y,0 };
 	Vector3 WallPos4 = position + (floorZBackwards);
-	AddCubeToWorld(WallPos4, Wall3Dim, 0);
+	AddCubeToWorld(WallPos4, Wall3Dim, 0);*/
 
 	return floor;
 }
@@ -659,9 +660,9 @@ void TutorialGame::InitGameExamples() {
 	player->GetRenderObject()->SetColour(Vector4(0, 1, 0, 1));
 
 	for (int i = 0; i < AmountGoats; ++i) {
-		int  spaceIncrement = 3*i;
+		int  spaceIncrement = 7*i;
 		Character* newCharacter = new Character(nullptr,nullptr,world);
-		newCharacter->Init("next goat", Vector3(100 + spaceIncrement, 24, 100 + spaceIncrement), charMesh, basicShader, world);
+		newCharacter->Init("next goat", Vector3(100 + spaceIncrement, 30, 100 + spaceIncrement), charMesh, basicShader, world);
 		newCharacter->GetRenderObject()->SetColour(Vector4(spaceIncrement/3, 1, spaceIncrement/2, spaceIncrement/4));
 		heard.push_back(static_cast<Character*>(newCharacter));
 	}
