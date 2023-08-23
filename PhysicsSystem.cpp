@@ -809,27 +809,41 @@ void PhysicsSystem::BroadPhaseConstantRBTree() {
 		}
 	}
 
-	for (const auto& [k, v] : RBtree) {
-		if (v.size() > 1) {
+	for (auto it = RBtree.begin(); it != RBtree.end(); ++it) {
+		const auto& [k, v] = *it;
+
+		if (!v.empty()) {
 			std::vector<GameObject*> tmp{ v.begin(), v.end() };
 			CollisionDetection::CollisionInfo info;
 
-			// Check all other objects against each other
-			for (size_t j = 0; j < v.size(); j++) {
-				for (size_t k = 0; k < j; k++) {
-					info.a = cp.first = std::min(tmp.at(j), tmp.at(k));
-					info.b = cp.second = std::max(tmp.at(j), tmp.at(k));
+			auto nextIt = it;
+			++nextIt;
 
-					// Check containment before adding collision
-					if (Contains(info.a, ((AABBVolume&)*((info.a)->GetBoundingVolume())).GetHalfDimensions(), k)) {
-						if (collisions_being_checked.insert(cp).second) {
-							broadphaseCollisions.insert(info);
-						};
+			while (nextIt != RBtree.end()) {
+				const auto& [nextK, nextV] = *nextIt;
 
-					};
+				if (!nextV.empty()) {
+					for (GameObject* obj1 : v) {
+						for (GameObject* obj2 : nextV) {
+							info.a = cp.first = std::min(obj1, obj2);
+							info.b = cp.second = std::max(obj1, obj2);
+
+							if ((info.a)->GetName() == "cube" && (info.a)->GetName() == "cube") {
+								continue;
+							}
+							// Check containment before adding collision
+							if (Contains(info.a, ((AABBVolume&)*(info.a->GetBoundingVolume())).GetHalfDimensions(), nextK)) {
+								if (collisions_being_checked.insert(cp).second) {
+									broadphaseCollisions.insert(info);
+								}
+							}
+						}
+					}
 				}
+
+				++nextIt;
 			}
-		} 
+		}
 	}
 }
 

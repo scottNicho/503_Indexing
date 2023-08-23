@@ -287,7 +287,7 @@ GameObject* TutorialGame::AddFloorToWorld(const Vector3& position) {
 
 	floor->SetName("floor");
 	floor->bTriggerDelete = true;
-	Vector3 floorSize = Vector3(200, 2, 200);
+	Vector3 floorSize = Vector3(75, 2, 75);
 	AABBVolume* volume = new AABBVolume(floorSize);
 	floor->SetBoundingVolume((CollisionVolume*)volume);
 	floor->GetTransform()
@@ -302,21 +302,21 @@ GameObject* TutorialGame::AddFloorToWorld(const Vector3& position) {
 	floor->GetPhysicsObject()->SetElasticity(0.0f);
 	world->AddGameObject(floor);
 	//wall 1 & 2
-	Vector3 Wall1Dim = { floorSize.x,30,2 };
-	Vector3 floorXForward = { 0,Wall1Dim.y,floorSize.x };
+	Vector3 Wall1Dim = { floorSize.x - 2,30,2 };
+	Vector3 floorXForward = { 0,Wall1Dim.y + 3,floorSize.x };
 	Vector3 WallPos1 = position + (floorXForward );
 	AddCubeToWorld(WallPos1, Wall1Dim, 0);
-	/*Vector3 floorXBackwards = { 0,Wall1Dim.y,-floorSize.x };
+	Vector3 floorXBackwards = { 0,Wall1Dim.y + 3,-floorSize.x };
 	Vector3 WallPos2 = position + (floorXBackwards);
-	AddCubeToWorld(WallPos2, Wall1Dim, 0);*/
+	AddCubeToWorld(WallPos2, Wall1Dim, 0);
 	//wall 3 & 4
-	/*Vector3 Wall3Dim = { 2,30,floorSize.x };
-	Vector3 floorZForward = { floorSize.x,Wall1Dim.y,0 };
+	Vector3 Wall3Dim = { 2,30,floorSize.x - 2 };
+	Vector3 floorZForward = { floorSize.x,Wall1Dim.y+3,0 };
 	Vector3 WallPos3 = position + (floorZForward);
 	AddCubeToWorld(WallPos3, Wall3Dim, 0);
-	Vector3 floorZBackwards = { -floorSize.x,Wall1Dim.y,0 };
+	Vector3 floorZBackwards = { -floorSize.x,Wall1Dim.y+3,0 };
 	Vector3 WallPos4 = position + (floorZBackwards);
-	AddCubeToWorld(WallPos4, Wall3Dim, 0);*/
+	AddCubeToWorld(WallPos4, Wall3Dim, 0);
 
 	return floor;
 }
@@ -653,7 +653,7 @@ void TutorialGame::InitGameExamples() {
 	//AddDoorToWorld(Vector3(10, -15, 0), Vector3(1, 2, 1), 0.0f);
 	//coins->InitCollectableGridWorld(2, 2, 10, 10, .2f, this);
 	//player->Init("Goaty",Vector3(80, 40, 50), charMesh, basicShader, world);
-	unsigned int AmountGoats = 1;
+	unsigned int AmountGoats = 9;
 	unsigned int column_Amount = 6;
 	unsigned int row_Amount = 6;
 	player->Init("Goaty", Vector3(100, 24, 100), charMesh, basicShader, world); //exact floor center 
@@ -662,8 +662,10 @@ void TutorialGame::InitGameExamples() {
 	for (int i = 0; i < AmountGoats; ++i) {
 		int  spaceIncrement = 7*i;
 		Character* newCharacter = new Character(nullptr,nullptr,world);
-		newCharacter->Init("next goat", Vector3(100 + spaceIncrement, 30, 100 + spaceIncrement), charMesh, basicShader, world);
-		newCharacter->GetRenderObject()->SetColour(Vector4(spaceIncrement/3, 1, spaceIncrement/2, spaceIncrement/4));
+		newCharacter->Init("next goat", Vector3(103 + spaceIncrement, 26, 100 + spaceIncrement), charMesh, basicShader, world);
+		//newCharacter->GetRenderObject()->SetColour(Vector4((1+spaceIncrement)/-2, 1+ spaceIncrement, (1+spaceIncrement)/2, spaceIncrement-3));
+		//newCharacter->GetRenderObject()->SetColour(Vector4((1 + spaceIncrement) / -2, -1, (1 + spaceIncrement) / 2,  3));
+		newCharacter->GetRenderObject()->SetColour(Vector4(0, 1, 0, 1));
 		heard.push_back(static_cast<Character*>(newCharacter));
 	}
 	
