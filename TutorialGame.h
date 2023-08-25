@@ -29,15 +29,6 @@ namespace NCL {
 			void OnCollisionEnd(GameObject* otherObject) override;
 		};
 
-		enum CollisionDMethod {
-			None,
-			QuadTreeY,
-			BpTree_const,
-			BpTree_NotConst,
-			RedBlackTree_const,
-			RedBlackTree
-			
-		};
 
 		class TutorialGame		{
 		public:
@@ -58,6 +49,7 @@ namespace NCL {
 			float force;
 			float playerRotateSpeed;
 			void InitialiseAssets();
+		    float minuteTimer;
 
 			void InitCamera();
 			void UpdateKeys(float dt);
@@ -156,7 +148,7 @@ namespace NCL {
 			}
 
 			GameObject* PowerUpObj = nullptr;
-			int collisionMethode;
+			CollisionDMethod collisionMethode;
 
 		};
 	}

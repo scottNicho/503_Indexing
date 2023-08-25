@@ -13,7 +13,7 @@
 #include "PhysicsSystem.h"
 #include <time.h>
 #include <cstdlib>
-
+#include <cmath>
 #include <fstream>
 
 using namespace NCL;
@@ -34,6 +34,7 @@ TutorialGame::TutorialGame(CollisionDMethod collMethod)	{
 	playerRotateSpeed = 0.25f;
 	forceMagnitude	= 10.0f;
 	HeardRunningTime = HeardTimer;
+	minuteTimer = 0.0f;
 	useGravity		= true;
 	inSelectionMode = false;
 	scoreManager = new ScoreManager();
@@ -51,11 +52,7 @@ TutorialGame::TutorialGame(CollisionDMethod collMethod)	{
 	}
 	auto startConstructorTime = std::chrono::high_resolution_clock::now();
 	physics = new PhysicsSystem(*world,collisionMethode);
-	auto endConstructorTime = std::chrono::high_resolution_clock::now();
-	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endConstructorTime - startConstructorTime).count();
-	csvFile << duration << "\n";
-	csvFile.close();
-
+	
 	InitialiseAssets();
 	
 	switch (collisionMethode)
@@ -79,6 +76,12 @@ TutorialGame::TutorialGame(CollisionDMethod collMethod)	{
 	default:
 		break;
 	}
+
+	auto endConstructorTime = std::chrono::high_resolution_clock::now();
+	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endConstructorTime - startConstructorTime).count();
+	csvFile << duration << "\n";
+	csvFile.close();
+
 
 
 	//std::vector <GameObject*>::const_iterator first;
@@ -144,11 +147,11 @@ TutorialGame::~TutorialGame()	{
 
 void TutorialGame::UpdateGame(float dt) {
 
-	if (menuManager) {
+	/*if (menuManager) {
 		menuManager->Update(dt);
-	}
+	}*/
 
-	if (menuManager->bPauesd) return;
+	//if (menuManager->bPauesd) return;
 
 	myDeltaTime += dt;
 	world->GetMainCamera()->UpdateCamera(dt);
@@ -163,7 +166,11 @@ void TutorialGame::UpdateGame(float dt) {
 	world->UpdateWorld(dt);
 	renderer->Update(dt);
 
+	if (minuteTimer >= 60.0f) {
+		return; 
+	}
 	physics->Update(dt);
+	minuteTimer += dt;
 
 	float cameraX = cameraDist * cos((world->GetMainCamera()->GetYaw() + 270) * 3.14f / 180) + player->GetTransform().GetPosition().x;
 	float cameraY = cameraDist * sin((world->GetMainCamera()->GetPitch()) * 3.14f / 180);
@@ -302,19 +309,19 @@ GameObject* TutorialGame::AddFloorToWorld(const Vector3& position) {
 	floor->GetPhysicsObject()->SetElasticity(0.0f);
 	world->AddGameObject(floor);
 	//wall 1 & 2
-	Vector3 Wall1Dim = { floorSize.x - 2,30,2 };
-	Vector3 floorXForward = { 0,Wall1Dim.y + 3,floorSize.x };
+	Vector3 Wall1Dim = { floorSize.x,30,2 };
+	Vector3 floorXForward = { 0,Wall1Dim.y,floorSize.x };
 	Vector3 WallPos1 = position + (floorXForward );
 	AddCubeToWorld(WallPos1, Wall1Dim, 0);
-	Vector3 floorXBackwards = { 0,Wall1Dim.y + 3,-floorSize.x };
+	Vector3 floorXBackwards = { 0,Wall1Dim.y,-floorSize.x };
 	Vector3 WallPos2 = position + (floorXBackwards);
 	AddCubeToWorld(WallPos2, Wall1Dim, 0);
 	//wall 3 & 4
-	Vector3 Wall3Dim = { 2,30,floorSize.x - 2 };
-	Vector3 floorZForward = { floorSize.x,Wall1Dim.y+3,0 };
+	Vector3 Wall3Dim = { 2,30,floorSize.x};
+	Vector3 floorZForward = { floorSize.x,Wall1Dim.y,0 };
 	Vector3 WallPos3 = position + (floorZForward);
 	AddCubeToWorld(WallPos3, Wall3Dim, 0);
-	Vector3 floorZBackwards = { -floorSize.x,Wall1Dim.y+3,0 };
+	Vector3 floorZBackwards = { -floorSize.x,Wall1Dim.y,0 };
 	Vector3 WallPos4 = position + (floorZBackwards);
 	AddCubeToWorld(WallPos4, Wall3Dim, 0);
 
@@ -653,20 +660,39 @@ void TutorialGame::InitGameExamples() {
 	//AddDoorToWorld(Vector3(10, -15, 0), Vector3(1, 2, 1), 0.0f);
 	//coins->InitCollectableGridWorld(2, 2, 10, 10, .2f, this);
 	//player->Init("Goaty",Vector3(80, 40, 50), charMesh, basicShader, world);
-	unsigned int AmountGoats = 9;
+	unsigned int AmountGoats = 11;
 	unsigned int column_Amount = 6;
 	unsigned int row_Amount = 6;
 	player->Init("Goaty", Vector3(100, 24, 100), charMesh, basicShader, world); //exact floor center 
 	player->GetRenderObject()->SetColour(Vector4(0, 1, 0, 1));
 
+	int  spaceIncrement = 3;
+	float angle = 0.0f;
+	Vector3 rotationCenter(103, 26, 100);
+
 	for (int i = 0; i < AmountGoats; ++i) {
-		int  spaceIncrement = 7*i;
+		
+		float angleRad = angle * (3.14159265358979323846 / 180.0f);
 		Character* newCharacter = new Character(nullptr,nullptr,world);
-		newCharacter->Init("next goat", Vector3(103 + spaceIncrement, 26, 100 + spaceIncrement), charMesh, basicShader, world);
+		Vector3 NewCharPlacement = Vector3(103 + spaceIncrement, 26, 100 + spaceIncrement);
+		Vector3 adjustedPoint = NewCharPlacement - rotationCenter;
+		float cosThe = std::cos(angleRad);
+		float sinThe = std::sin(angleRad);
+		float newX = cosThe * adjustedPoint.x + sinThe * adjustedPoint.z;
+		float newZ = -sinThe * adjustedPoint.x + cosThe * adjustedPoint.z;
+		Vector3 rotatedVec = {newX,adjustedPoint.y,newZ};
+		rotatedVec += rotationCenter; // translate back after the rotation
+
+		if (i % 7 == 0) {
+			angle += 20.0f;
+			spaceIncrement = 0;
+		}
+		newCharacter->Init("next goat", rotatedVec, charMesh, basicShader, world);
 		//newCharacter->GetRenderObject()->SetColour(Vector4((1+spaceIncrement)/-2, 1+ spaceIncrement, (1+spaceIncrement)/2, spaceIncrement-3));
 		//newCharacter->GetRenderObject()->SetColour(Vector4((1 + spaceIncrement) / -2, -1, (1 + spaceIncrement) / 2,  3));
 		newCharacter->GetRenderObject()->SetColour(Vector4(0, 1, 0, 1));
 		heard.push_back(static_cast<Character*>(newCharacter));
+		spaceIncrement += 3;
 	}
 	
 	

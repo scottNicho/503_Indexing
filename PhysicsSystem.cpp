@@ -15,7 +15,7 @@
 using namespace NCL;
 using namespace CSC8503;
 
-PhysicsSystem::PhysicsSystem(GameWorld& g, int NewDetectionMethode) : gameWorld(g) {
+PhysicsSystem::PhysicsSystem(GameWorld& g, CollisionDMethod NewDetectionMethode) : gameWorld(g) {
 	applyGravity = false;
 	useBroadPhase = true;
 	DetectionMethode = NewDetectionMethode;
@@ -166,11 +166,10 @@ void PhysicsSystem::Update(float dt) {
 
 			// Calculate narrow phase duration
 			auto narrowPhaseEndTime = std::chrono::high_resolution_clock::now();
-			auto narrowPhaseDuration = std::chrono::duration_cast<std::chrono::milliseconds>(
-				narrowPhaseEndTime - narrowPhaseStartTime).count();
+			auto narrowPhaseDuration = std::chrono::duration<double, std::milli>(narrowPhaseEndTime - narrowPhaseStartTime).count();
 			std::ofstream narrowPhaseFile("narrow_phase_times.csv", std::ios_base::app);
 			if (narrowPhaseFile.is_open()) {
-				narrowPhaseFile << narrowPhaseDuration << "\n";
+				narrowPhaseFile << std::chrono::duration<double, std::milli>(narrowPhaseEndTime - narrowPhaseStartTime).count() << "\n";
 				narrowPhaseFile.close();
 			}
 			else {
@@ -440,7 +439,8 @@ void PhysicsSystem::RedBlack_initialisation() {
 }
 
 void PhysicsSystem::BroadPhaseBppTree() {
-
+	broadphasemap(bptree2, true);
+#if 0
 	//QuadTree <GameObject*> tree(Vector2(1024, 1024), 7, 6);
 	//print_tree(bptree);
 	broadphaseCollisions.clear();
@@ -569,10 +569,13 @@ void PhysicsSystem::BroadPhaseBppTree() {
 	destroy_tree(bptree);
 	bptree = nullptr;
 #endif
+#endif 
 }
 
 
 void PhysicsSystem::BroadPhaseNotConstantBppTree() {
+	broadphasemap(bptree2, false);
+#if 0
 	broadphaseCollisions.clear();
 	collisions_being_checked.clear();
 
@@ -600,6 +603,7 @@ void PhysicsSystem::BroadPhaseNotConstantBppTree() {
 
 	// Old way: delete the tree all the times
 	// New code: only to be called in the destructor
+#endif
 }
 
 
@@ -668,7 +672,19 @@ void PhysicsSystem::InsertGameObjectIntoBTree(GameObject* gameObject, bool check
 		if (finished) break;
 		if (*old_first > *novel_first) {
 			min_z_value = std::min(min_z_value, *novel_first);
-			bptree2[*novel_first].emplace(gameObject);
+			switch (DetectionMethode) {
+				case None:
+				case QuadTreeY:
+					break;
+				case BpTree_const:
+				case BpTree_NotConst:
+					bptree2[*novel_first].emplace(gameObject);
+					break;
+				case RedBlackTree_const:
+				case RedBlackTree:
+					RBtree[*novel_first].emplace(gameObject);
+					break;
+			}
 			//bptree = insert(bptree, *novel_first, (void*)gameObject);
 			novel_first++;
 		}
@@ -687,7 +703,20 @@ void PhysicsSystem::InsertGameObjectIntoBTree(GameObject* gameObject, bool check
 	}
 	while (novel_first != last2) {
 		min_z_value = std::min(min_z_value, *novel_first);
-		bptree2[*novel_first].insert(gameObject);
+		switch (DetectionMethode) {
+		case None:
+		case QuadTreeY:
+			break;
+		case BpTree_const:
+		case BpTree_NotConst:
+			bptree2[*novel_first].insert(gameObject);
+			break;
+		case RedBlackTree_const:
+		case RedBlackTree:
+			RBtree[*novel_first].emplace(gameObject);
+			break;
+		}
+
 		//bptree = insert(bptree, *novel_first, (void*)gameObject);
 		gameObject->SetKeyValue(*novel_first); //set key value
 		novel_first++;
@@ -702,12 +731,30 @@ void PhysicsSystem::InsertGameObjectIntoBTree(GameObject* gameObject, bool check
 
 
 bool PhysicsSystem::RemoveGameObjectWithZValue(GameObject* gameObject, unsigned long long Z_value) {
+	switch (DetectionMethode) {
+		case None:
+		case QuadTreeY:
+			break;
 
-	auto it = bptree2.find(Z_value);
-	if (it == bptree2.end()) return false;
-	else {
-		return (it->second.erase(gameObject) == 1);
+		case BpTree_const:
+		case BpTree_NotConst: {
+			auto it = bptree2.find(Z_value);
+			if (it == bptree2.end()) return false;
+			else {
+				return (it->second.erase(gameObject) == 1);
+			}
+		} break;
+
+		case RedBlackTree_const:
+		case RedBlackTree: {
+			auto it = RBtree.find(Z_value);
+			if (it == RBtree.end()) return false;
+			else {
+				return (it->second.erase(gameObject) == 1);
+			}
+		} break;
 	}
+
 }
 /*
 
@@ -737,9 +784,9 @@ void PhysicsSystem::NarrowPhase() {
 				std::cout << "floor & next goat" << std::endl;
 			};
 		}*/
-		if (info.a->GetName() == "next goat") {
+		/*if (info.a->GetName() == "next goat") {
 			std::cout << info.b->GetName() << std::endl;
-		}
+		}*/
 
 		if (CollisionDetection::ObjectIntersection(info.a, info.b, info)) {
 			info.framesLeft = numCollisionFrames;
@@ -750,6 +797,8 @@ void PhysicsSystem::NarrowPhase() {
 }
 
 void PhysicsSystem::InsertGameObjectIntoRBTree(GameObject* gameObject, bool checkContainment ) {
+	InsertGameObjectIntoBTree(gameObject, checkContainment);
+#if 0
 	// Calculate the object's Z value for broadphase grouping
 	Vector3 ObjectPosition = gameObject->GetTransform().GetPosition();
 	unsigned long long Z_value = CalculateZValue(ObjectPosition.x,ObjectPosition.y);
@@ -769,9 +818,12 @@ void PhysicsSystem::InsertGameObjectIntoRBTree(GameObject* gameObject, bool chec
 			}
 		}
 	}
+#endif
 }
 
 bool PhysicsSystem::RemoveGameObjectWithZZValue(GameObject* gameObject, unsigned long long Z_value) {
+	return RemoveGameObjectWithZValue(gameObject, Z_value);
+#if 0
 	auto it = RBtree.find(Z_value);
 	if (it != RBtree.end()) {
 		it->second.erase(gameObject);
@@ -781,9 +833,146 @@ bool PhysicsSystem::RemoveGameObjectWithZZValue(GameObject* gameObject, unsigned
 		return true;
 	}
 	return false;
+#endif
 }
 
+
+
+
 void PhysicsSystem::BroadPhaseConstantRBTree() {
+	broadphasemap(RBtree, true);
+
+#if 0
+	//QuadTree <GameObject*> tree(Vector2(1024, 1024), 7, 6);
+	//print_tree(bptree);
+	broadphaseCollisions.clear();
+	collisions_being_checked.clear();
+	finalise_initialisation();
+
+	//print_tree();
+	//std::cout << "";
+
+#if 0
+	// BEGIN: part to be moved in the constructor, but only in the most recent version of the code!
+	min_z_value = std::numeric_limits<unsigned long long>::max();
+	//Vector3 low;
+	//Vector3 high;
+	std::vector <GameObject*>::const_iterator first;
+	std::vector <GameObject*>::const_iterator last;
+	gameWorld.GetObjectIterators(first, last);
+	//std::unordered_map< GameObject*, std::set<unsigned long long>> points;
+	for (auto i = first; i != last; ++i) {
+		(*i)->ClearZValues(); // ONly in this old logic! Because, we know the bptree is empty, and therefore, has no previous point
+		InsertGameObjectIntoBTree(*i);
+	}
+	// END: part to be moved...
+#endif
+
+	//exit(1);
+	std::pair<GameObject*, GameObject*> cp;
+
+	for (const auto& [k, v] : RBtree) {
+		if (v.size() > 1) {
+			std::vector<GameObject*> tmp{ v.begin(), v.end() };
+			CollisionDetection::CollisionInfo info;
+			for (int j = 0; j < v.size(); j++)
+				for (int k = 0; k < j; k++) {
+					info.a = cp.first = std::min(tmp.at(k), tmp.at(j));
+					info.b = cp.second = std::max(tmp.at(k), tmp.at(j));
+					if (collisions_being_checked.insert(cp).second)
+						broadphaseCollisions.insert(info);
+				}
+			//std::cout << v.size() << std::endl;
+			//v.clear();
+		}
+	}
+
+#if 0
+	/*auto itSet = points.begin();
+	auto& setId1 = itSet->second;
+	itSet++;
+	auto& setId2 = itSet->second;
+	std::vector<unsigned long long> result;
+	std::set_intersection(setId1.begin(), setId1.end(), setId2.begin(), setId2.end(), std::back_inserter(result));
+	*/
+	std::pair<GameObject*, GameObject*> cp;
+	int i;
+	std::vector<GameObject*> v;
+	node* n = find_leaf(bptree, min_z_value, false);// Finding the element from the tree
+	if (n == nullptr)
+		return; // Nothing was found
+	for (i = 0; i < (n->order - 1) && (unsigned long long)n->keys[i] < (unsigned long long)min_z_value; i++) // getting the key within the node if exists
+		;
+	if (i == n->num_keys)
+		return; // Nothing was found: beyond the set of elements
+
+
+	unsigned long long CurrentZ = n->keys[i];
+	//std::vector<GameObject*> LastObjects{};
+
+	while (n != nullptr) {
+		// TASK: collect in v all the game objects, n->pointers[i], having all the same z value, n->keys[i]
+
+		/*if (std::lower_bound(result.begin(), result.end(), CurrentZ) == result.end()) {
+			std::cout << "not in intersection!" << std::endl;
+		} else {
+			std::cout << "in intersection!" << std::endl;
+		}*/
+
+		while ((n->keys[i] == CurrentZ) && (i < n->num_keys)) {
+			if (n->pointers[i])
+				v.push_back(static_cast<GameObject*>(n->pointers[i]));
+			i++;
+		}
+
+		auto next_leaf = static_cast<node*>(n->pointers[n->order - 1]);
+
+		if (((i == n->num_keys) && !next_leaf) || (((i != n->num_keys)) && (n->keys[i] != CurrentZ))) {
+			std::sort(v.begin(), v.end());
+			v.erase(std::unique(v.begin(), v.end()), v.end());
+			if (v.size() > 1) {
+				// As soon as you detect a new different key, that is, as soon as you finish scanning all the nodes with the same z value,
+				// Do a cross product across all the pointers associated to it
+				CollisionDetection::CollisionInfo info;
+				for (int j = 0; j < v.size(); j++)
+					for (int k = 0; k < j; k++) {
+						info.a = cp.first = std::min(v.at(i), v.at(j));
+						info.b = cp.second = std::max(v.at(i), v.at(j));
+						if (collisions_being_checked.insert(cp).second)
+							broadphaseCollisions.insert(info);
+					}
+				std::cout << v.size() << std::endl;
+				v.clear();
+			}
+		}
+
+		/*for (; i < n->num_keys; i++) { // Iterating over the existing elements
+			returned_keys[num_found] = n->keys[i];
+			returned_pointers[num_found] = n->pointers[i];
+			num_found++;
+		}*/
+		if (i == n->num_keys) {
+			n = next_leaf; // Moving towards the next leaf
+			i = 0; // re-setting the counter to zero
+		}
+		else {
+			CurrentZ = n->keys[i];
+		}
+	}
+#endif
+
+
+	//bptree.clear();
+	RBtree.clear();
+
+#if 0
+	// Old way: delete the tree all the times
+	// New code: only to be called in the destructor
+	destroy_tree(bptree);
+	bptree = nullptr;
+#endif
+
+#if 0
 	broadphaseCollisions.clear();
 	collisions_being_checked.clear();
 
@@ -828,9 +1017,9 @@ void PhysicsSystem::BroadPhaseConstantRBTree() {
 							info.a = cp.first = std::min(obj1, obj2);
 							info.b = cp.second = std::max(obj1, obj2);
 
-							if ((info.a)->GetName() == "cube" && (info.a)->GetName() == "cube") {
+							/*if ((info.a)->GetName() == "cube" && (info.a)->GetName() == "cube") {
 								continue;
-							}
+							}*/
 							// Check containment before adding collision
 							if (Contains(info.a, ((AABBVolume&)*(info.a->GetBoundingVolume())).GetHalfDimensions(), nextK)) {
 								if (collisions_being_checked.insert(cp).second) {
@@ -845,6 +1034,8 @@ void PhysicsSystem::BroadPhaseConstantRBTree() {
 			}
 		}
 	}
+#endif
+#endif
 }
 
 

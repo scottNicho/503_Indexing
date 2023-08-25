@@ -149,6 +149,18 @@ encode_morton_2d(std::pair<UnsignedInteger, UnsignedInteger> xy)
 
 namespace NCL {
     namespace CSC8503 {
+
+
+        enum CollisionDMethod {
+            None,
+            QuadTreeY,
+            BpTree_const,
+            BpTree_NotConst,
+            RedBlackTree_const,
+            RedBlackTree
+
+        };
+
         struct node;
 
         class PhysicsSystem {
@@ -158,7 +170,7 @@ namespace NCL {
             frozenca::BTreeMap<unsigned long long, std::unordered_set<GameObject*>> bptree2;
 
             //node* bptree = nullptr;
-            PhysicsSystem(GameWorld& g, int NewDetectionMethode);
+            PhysicsSystem(GameWorld& g, CollisionDMethod NewDetectionMethode);
             ~PhysicsSystem();
             void finalise_initialisation();
 
@@ -196,6 +208,31 @@ namespace NCL {
             void RedBlack_initialisation();
 
         protected:
+
+            template <typename Map> inline void broadphasemap(Map& map, bool doFinalise) {
+                broadphaseCollisions.clear();
+                collisions_being_checked.clear();
+                if (doFinalise) 
+                    finalise_initialisation();
+
+                std::pair<GameObject*, GameObject*> cp;
+                for (const auto& [k, v] : map) {
+                    if (v.size() > 1) {
+                        std::vector<GameObject*> tmp{ v.begin(), v.end() };
+                        CollisionDetection::CollisionInfo info;
+                        for (int j = 0; j < v.size(); j++)
+                            for (int k = 0; k < j; k++) {
+                                info.a = cp.first = std::min(tmp.at(k), tmp.at(j));
+                                info.b = cp.second = std::max(tmp.at(k), tmp.at(j));
+                                if (collisions_being_checked.insert(cp).second)
+                                    broadphaseCollisions.insert(info);
+                            }
+                    }
+                }
+
+                if (doFinalise)
+                    map.clear();
+            }
 
             unsigned long long CalculateZValue(float xPoint, float yPoint) {
                 // Scale and truncate the floating-point coordinates to integers
@@ -247,7 +284,7 @@ namespace NCL {
             std::vector<CollisionDetection::CollisionInfo> broadphaseCollisionsVec;
             bool useBroadPhase = true;
             int numCollisionFrames = 5;
-            int DetectionMethode;
+            CollisionDMethod DetectionMethode;
         };
     }
 }
