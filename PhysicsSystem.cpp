@@ -155,10 +155,11 @@ void PhysicsSystem::Update(float dt) {
 
 
 			auto endTime = std::chrono::high_resolution_clock::now();
-			auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
+			auto duration = std::chrono::duration<double, std::milli>(endTime - startTime).count();
 			//std::cout << "Execution time: " << duration << " ms" << std::endl;
-			csvFile << duration << "\n";
+			csvFile << duration << ",";
 			csvFile.close();
+
 
 			auto narrowPhaseStartTime = std::chrono::high_resolution_clock::now();
 
@@ -169,7 +170,7 @@ void PhysicsSystem::Update(float dt) {
 			auto narrowPhaseDuration = std::chrono::duration<double, std::milli>(narrowPhaseEndTime - narrowPhaseStartTime).count();
 			std::ofstream narrowPhaseFile("narrow_phase_times.csv", std::ios_base::app);
 			if (narrowPhaseFile.is_open()) {
-				narrowPhaseFile << std::chrono::duration<double, std::milli>(narrowPhaseEndTime - narrowPhaseStartTime).count() << "\n";
+				narrowPhaseFile << std::chrono::duration<double, std::milli>(narrowPhaseEndTime - narrowPhaseStartTime).count() << ",";
 				narrowPhaseFile.close();
 			}
 			else {
@@ -401,7 +402,7 @@ void PhysicsSystem::BroadPhaseQuadTree() {
 }
 
 
-constexpr float back_transformation_scaling_value = 50.0;
+ float PhysicsSystem::back_transformation_scaling_value = 0.0f;
 
 void PhysicsSystem::finalise_initialisation() {
 	//addded construction for BroadPhaseInConstantBppTree
@@ -1038,6 +1039,9 @@ void PhysicsSystem::BroadPhaseConstantRBTree() {
 #endif
 }
 
+void PhysicsSystem::BroadPhaseNonConstantRBTree() {
+	broadphasemap(RBtree, false);
+}
 
 bool PhysicsSystem::Contains(GameObject* object,Vector3 halfDims ,unsigned long long Z_value) {
 	// Decode the Z_value to get x and y coordinates of the cell

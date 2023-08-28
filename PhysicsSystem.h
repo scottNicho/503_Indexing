@@ -169,6 +169,7 @@ namespace NCL {
             std::map<unsigned long long, std::unordered_set<GameObject*>> RBtree;
             frozenca::BTreeMap<unsigned long long, std::unordered_set<GameObject*>> bptree2;
 
+            static float back_transformation_scaling_value;
             //node* bptree = nullptr;
             PhysicsSystem(GameWorld& g, CollisionDMethod NewDetectionMethode);
             ~PhysicsSystem();
@@ -212,8 +213,9 @@ namespace NCL {
             template <typename Map> inline void broadphasemap(Map& map, bool doFinalise) {
                 broadphaseCollisions.clear();
                 collisions_being_checked.clear();
-                if (doFinalise) 
+                if (doFinalise) {
                     finalise_initialisation();
+                }
 
                 std::pair<GameObject*, GameObject*> cp;
                 for (const auto& [k, v] : map) {
@@ -270,6 +272,7 @@ namespace NCL {
             void InsertGameObjectIntoRBTree(GameObject* gameObject, bool checkContainment = false);
             bool RemoveGameObjectWithZZValue(GameObject* gameObject, unsigned long long Z_value);
             void BroadPhaseConstantRBTree();
+            void BroadPhaseNonConstantRBTree();
 
             GameWorld& gameWorld;
 

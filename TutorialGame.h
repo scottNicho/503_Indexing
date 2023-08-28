@@ -41,6 +41,8 @@ namespace NCL {
 
 			TextureBase* basicTex = nullptr;
 			ShaderBase* basicShader = nullptr;
+			static unsigned int AmountGoats;
+		    static bool ExitMain;
 
 		protected:
 			NPC_Group* npcGroup;

@@ -19,6 +19,9 @@
 using namespace NCL;
 using namespace CSC8503;
 
+bool TutorialGame::ExitMain = false;
+unsigned int TutorialGame::AmountGoats = 0;
+
 TutorialGame::TutorialGame(CollisionDMethod collMethod)	{
 	world		= new GameWorld();
 #ifdef USEVULKAN
@@ -72,6 +75,7 @@ TutorialGame::TutorialGame(CollisionDMethod collMethod)	{
 		physics->RedBlack_initialisation();
 		break;
 	case 5:
+		physics->finalise_initialisation();
 		break;
 	default:
 		break;
@@ -167,7 +171,33 @@ void TutorialGame::UpdateGame(float dt) {
 	renderer->Update(dt);
 
 	if (minuteTimer >= 60.0f) {
-		return; 
+		std::ofstream csvFile("physics_times.csv", std::ios::app);
+
+		if (!csvFile.is_open()) {
+			std::cerr << "Failed to open CSV file for writing!" << std::endl;
+			return;
+		}
+
+		csvFile << "\n";
+		csvFile.close();
+
+		std::ofstream narrowPhaseFile("narrow_phase_times.csv", std::ios_base::app);
+		if (narrowPhaseFile.is_open()) {
+			narrowPhaseFile  << "\n";
+			narrowPhaseFile.close();
+		}
+		else {
+			std::cout << "narrowPhaseFailure" << std::endl;
+		}
+
+		ExitMain = true;
+		minuteTimer = 0.0f;
+		return;
+		
+	}
+	else
+	{
+		ExitMain = false;
 	}
 	physics->Update(dt);
 	minuteTimer += dt;
@@ -294,7 +324,7 @@ GameObject* TutorialGame::AddFloorToWorld(const Vector3& position) {
 
 	floor->SetName("floor");
 	floor->bTriggerDelete = true;
-	Vector3 floorSize = Vector3(75, 2, 75);
+	Vector3 floorSize = Vector3(100, 2, 100);
 	AABBVolume* volume = new AABBVolume(floorSize);
 	floor->SetBoundingVolume((CollisionVolume*)volume);
 	floor->GetTransform()
@@ -660,7 +690,6 @@ void TutorialGame::InitGameExamples() {
 	//AddDoorToWorld(Vector3(10, -15, 0), Vector3(1, 2, 1), 0.0f);
 	//coins->InitCollectableGridWorld(2, 2, 10, 10, .2f, this);
 	//player->Init("Goaty",Vector3(80, 40, 50), charMesh, basicShader, world);
-	unsigned int AmountGoats = 11;
 	unsigned int column_Amount = 6;
 	unsigned int row_Amount = 6;
 	player->Init("Goaty", Vector3(100, 24, 100), charMesh, basicShader, world); //exact floor center 
