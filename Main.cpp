@@ -31,6 +31,7 @@ using namespace CSC8503;
 #include <thread>
 #include <sstream>
 
+#include <execution>
 
 class PauseScreen : public PushdownState {
 	PushdownResult OnUpdate(float dt,
@@ -372,12 +373,14 @@ hide or show the
 */
 
 std::vector<int> ScalingOneHundredVec = { 1,2,4,8,16,32,64,100 };
+std::vector<int> ScalingTwoHundredVec = { 1,2,4,8,16,32,64,128,200};
 
 std::vector<int> OneHundredVec = {0,1,3,7,15,31,63,99};
 std::vector<int> OneHundredFiftyVec = { 0,1,3,7,15,31,63,127,149};
 std::vector<int> TwoHundredVector = { 0,1,3,7,15,31,63,127,199};
+std::vector<int> TwoHundredVectorIndices = { 0,1,2,3,4,5,6,7,8 };
 
-int SubMain() {
+int SubMain(int b) {
 	Window* w = Window::CreateGameWindow("CSC8503 Game technology!", 1280, 720);
 	//TestPushdownAutomata(w);
 
@@ -388,9 +391,9 @@ int SubMain() {
 	w->ShowOSPointer(false);
 	w->LockMouseToWindow(true);
 
-	TutorialGame* g = new TutorialGame(CollisionDMethod::BpTree_const);
+	TutorialGame* g = new TutorialGame(CollisionDMethod::QuadTreeY);
 	w->GetTimer()->GetTimeDeltaSeconds(); //Clear the timer so we don't get a larget first dt!
-
+	TutorialGame::CSV_FileGaps(b);
 	//TestStateMachine();
 	//TestPathfinding();
 	//TestBehaviourTree();
@@ -424,12 +427,26 @@ int SubMain() {
 }
 
 int main() {
-	for (auto jq : ScalingOneHundredVec) {
+	int count = 0;
+	for (auto jq : ScalingTwoHundredVec) {
 		PhysicsSystem::back_transformation_scaling_value = jq;
-		for (auto xi : OneHundredVec) {
+		for (auto xi : TwoHundredVector) {
 			TutorialGame::AmountGoats = xi;
-			SubMain();
+			SubMain(count);
+			count++;
 		}
+
+
+		/*std::for_each(std::execution::par, TwoHundredVectorIndices.begin(), TwoHundredVectorIndices.end(),
+			[&](int index)
+			{
+				int xi = TwoHundredVector[index];
+				TutorialGame::AmountGoats = xi;
+				SubMain(index);
+			}
+		);*/
+
+		count = 0;
 	}
 }
 

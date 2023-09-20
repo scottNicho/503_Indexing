@@ -120,6 +120,7 @@ void TutorialGame::InitialiseAssets() {
 	damping = 0.4f;
 
 	menuManager->Init();
+
 }
 
 TutorialGame::~TutorialGame()	{
@@ -148,6 +149,39 @@ TutorialGame::~TutorialGame()	{
 	}
 }
 
+
+void TutorialGame::CSV_FileGaps(int a) {
+
+	if (a == 0) {
+		std::ofstream csvFile("physics_times.csv", std::ios::app);
+
+		if (!csvFile.is_open()) {
+			std::cerr << "Failed to open CSV file for writing!" << std::endl;
+			return;
+		}
+
+		csvFile << "\n";
+		csvFile << "\n";
+		csvFile << "\n";
+		csvFile.close();
+
+		std::ofstream narrowPhaseFile("narrow_phase_times.csv", std::ios_base::app);
+		if (narrowPhaseFile.is_open()) {
+			narrowPhaseFile << "\n";
+			narrowPhaseFile << "\n";
+			narrowPhaseFile << "\n";
+			narrowPhaseFile.close();
+		}
+		else {
+			std::cout << "narrowPhaseFailure" << std::endl;
+		}
+	}
+	else
+	{
+		return;
+	}
+	return;
+}
 
 void TutorialGame::UpdateGame(float dt) {
 
@@ -324,7 +358,7 @@ GameObject* TutorialGame::AddFloorToWorld(const Vector3& position) {
 
 	floor->SetName("floor");
 	floor->bTriggerDelete = true;
-	Vector3 floorSize = Vector3(100, 2, 100);
+	Vector3 floorSize = Vector3(200, 2, 200);
 	AABBVolume* volume = new AABBVolume(floorSize);
 	floor->SetBoundingVolume((CollisionVolume*)volume);
 	floor->GetTransform()

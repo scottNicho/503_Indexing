@@ -43,6 +43,7 @@ namespace NCL {
 			ShaderBase* basicShader = nullptr;
 			static unsigned int AmountGoats;
 		    static bool ExitMain;
+			static void CSV_FileGaps(int a);
 
 		protected:
 			NPC_Group* npcGroup;
